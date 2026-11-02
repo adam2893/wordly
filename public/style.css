@@ -1152,7 +1152,7 @@ html[data-theme="desert"] .key {
 /* Bakery case: cream base, chocolate text, pistachio correct, caramel
    present, strawberry accent, soft rounded tiles. */
 [data-theme="dessert"] {
-  --color-bg: #fff6ea;
+  --color-bg: #fde2e6;
   --color-surface: #ffffff;
   --color-text: #4a2a1a;
   --color-text-dim: #8a6450;
@@ -1179,11 +1179,6 @@ html[data-theme="dessert"] .key {
 }
 html[data-theme="dessert"] .key {
   box-shadow: 0 2px 0 #e2c3a6;
-}
-html[data-theme="dessert"] .app-header {
-  background: rgba(255, 246, 234, 0.94);
-  box-shadow: 0 4px 0 #5a3221;
-  border-bottom-color: #5a3221;
 }
 html[data-theme="dessert"] .tile.absent,
 html[data-theme="dessert"] .key.absent {
@@ -1409,25 +1404,28 @@ body {
 }
 
 [data-theme="tropical"] body {
-  /* Hand-built SVG: lagoon at dusk, palms, hibiscus, beach. */
+  /* User-supplied photo: palm beach over turquoise water. The bright sky
+     behind the header gets a darker band so the white title stays crisp. */
   background-image:
-    linear-gradient(180deg, rgba(3, 30, 36, 0.55) 0, rgba(3, 30, 36, 0.15) 160px, rgba(3, 30, 36, 0.1) 100%),
-    url("images/themes/tropical.svg");
+    linear-gradient(180deg, rgba(4, 40, 60, 0.6) 0%, rgba(4, 40, 60, 0.3) 12%, rgba(4, 40, 60, 0.15) 40%, rgba(4, 40, 60, 0.2) 100%),
+    url("images/themes/tropical.webp");
 }
 
 [data-theme="desert"] body {
-  /* Hand-built SVG: starry dusk over mesas and saguaros. */
+  /* User-supplied photo: saguaros and dunes under a pale blue sky. Light
+     image, so a warm dark band at the top for the header text and a
+     light scrim elsewhere. */
   background-image:
-    linear-gradient(180deg, rgba(18, 8, 20, 0.35) 0, rgba(18, 8, 20, 0.1) 200px, rgba(18, 8, 20, 0.35) 100%),
-    url("images/themes/desert.svg");
+    linear-gradient(180deg, rgba(38, 18, 31, 0.7) 0%, rgba(38, 18, 31, 0.35) 12%, rgba(38, 18, 31, 0.2) 40%, rgba(38, 18, 31, 0.3) 100%),
+    url("images/themes/desert.webp");
 }
 
 [data-theme="dessert"] body {
-  /* Hand-built SVG: chocolate drip, donuts, macarons, ice cream.
-     Light image + dark text, so a light wash instead of a dark scrim. */
+  /* User-supplied illustration: pastel cakes and strawberries. Light
+     image + dark text, so just a soft cream wash to calm it under text. */
   background-image:
-    linear-gradient(rgba(255, 246, 234, 0.2), rgba(255, 246, 234, 0.2)),
-    url("images/themes/dessert.svg");
+    linear-gradient(180deg, rgba(255, 244, 246, 0.88) 0, rgba(255, 244, 246, 0.6) 110px, rgba(255, 240, 244, 0.35) 220px, rgba(255, 240, 244, 0.35) 100%),
+    url("images/themes/dessert.webp");
 }
 
 
