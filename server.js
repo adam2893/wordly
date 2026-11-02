@@ -69,6 +69,7 @@ function createStore(fileName) {
 const wordlyStore = createStore("scores.json");
 const beeStore = createStore("bee.json");
 const boxedStore = createStore("boxed.json");
+const connectionsStore = createStore("connections.json");
 
 // ---------- shared helpers ----------
 
@@ -340,6 +341,62 @@ function submitBoxedScore(body) {
   return boxedStore.write(records).then(() => record);
 }
 
+// ---------- Connections ----------
+
+function computeConnectionsLeaderboard(date) {
+  const records = connectionsStore.read();
+
+  const today = records
+    .filter((r) => r.date === date)
+    .map((r) => ({ name: r.name, solved: r.solved, mistakes: r.mistakes, groups: r.groups, timeMs: r.timeMs }))
+    .sort(
+      (a, b) =>
+        Number(b.solved) - Number(a.solved) ||
+        a.mistakes - b.mistakes ||
+        b.groups - a.groups ||
+        (a.timeMs ?? Infinity) - (b.timeMs ?? Infinity) ||
+        a.name.localeCompare(b.name)
+    );
+
+  const overall = [];
+  for (const [name, games] of groupByPlayer(records)) {
+    const won = games.filter((g) => g.solved);
+    overall.push({
+      name,
+      played: games.length,
+      solved: won.length,
+      winPct: games.length ? Math.round((won.length / games.length) * 100) : 0,
+      perfect: won.filter((g) => g.mistakes === 0).length,
+      avgMistakes: average(won.map((g) => g.mistakes), 1),
+      bestTimeMs: minOrNull(won.filter((g) => Number.isFinite(g.timeMs)).map((g) => g.timeMs)),
+      ...streaks(games, (g) => g.solved),
+    });
+  }
+  overall.sort(
+    (a, b) =>
+      b.solved - a.solved || b.winPct - a.winPct || (a.avgMistakes ?? Infinity) - (b.avgMistakes ?? Infinity) || a.name.localeCompare(b.name)
+  );
+  return { today, overall };
+}
+
+function submitConnectionsScore(body) {
+  const name = validName(body.name);
+  const date = validDate(body.date);
+  if (typeof body.solved !== "boolean") throw new Error("invalid solved");
+  const mistakes = intInRange(body.mistakes, 0, 4, "mistakes");
+  const groups = intInRange(body.groups, 0, 4, "groups");
+  if (body.solved ? groups !== 4 || mistakes > 3 : mistakes !== 4) throw new Error("inconsistent result");
+  const timeMs = optionalMs(body.timeMs, "timeMs");
+
+  const records = connectionsStore.read();
+  const existing = records.find((r) => r.name === name && r.date === date);
+  // First finished game of the day counts, like Letter Boxed.
+  if (existing) return Promise.resolve(existing);
+  const record = { name, date, solved: body.solved, mistakes, groups, timeMs, submittedAt: new Date().toISOString() };
+  records.push(record);
+  return connectionsStore.write(records).then(() => record);
+}
+
 // ---------- rate limiting ----------
 
 // Fixed-window counters per client IP. Writes are the thing worth
@@ -524,6 +581,15 @@ const ROUTES = {
   "POST /api/boxed/score": {
     limit: "write",
     handler: async (url, req) => submitBoxedScore(await readJSONBody(req)),
+  },
+
+  "GET /api/connections/leaderboard": {
+    limit: "read",
+    handler: (url) => computeConnectionsLeaderboard(validDate(url.searchParams.get("date"))),
+  },
+  "POST /api/connections/score": {
+    limit: "write",
+    handler: async (url, req) => submitConnectionsScore(await readJSONBody(req)),
   },
 };
 

@@ -67,6 +67,20 @@
     </span>
   </a>
 
+  <a class="game-card" href="/connections">
+    <span class="game-icon icon-connections" aria-hidden="true">
+      <span class="c t0 bar"></span>
+      <span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span>
+      <span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span>
+      <span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span>
+    </span>
+    <span class="game-info">
+      <span class="game-name">Connections</span>
+      <span class="game-desc">Sort 16 words into four hidden groups.</span>
+      <span id="status-connections" class="game-status"></span>
+    </span>
+  </a>
+
   <p class="menu-foot">New daily puzzles every midnight · each game has its own leaderboard &#127942;</p>
 </main>
 
@@ -113,6 +127,21 @@
     set("status-boxed", "Today: in progress", true);
   } else {
     set("status-boxed", "Today's box is waiting");
+  }
+
+  const conn = S.load(`connections:daily:${today}`);
+  if (conn && conn.over) {
+    set(
+      "status-connections",
+      conn.won
+        ? `Today: ✓ solved · ${conn.mistakes} mistake${conn.mistakes === 1 ? "" : "s"}`
+        : `Today: ✗ ${(conn.solved || []).length}/4 groups`,
+      true
+    );
+  } else if (conn && conn.started) {
+    set("status-connections", `Today: in progress · ${(conn.solved || []).length}/4 groups`, true);
+  } else {
+    set("status-connections", "Today's puzzle is waiting");
   }
 
   greet();
