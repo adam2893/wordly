@@ -20,6 +20,9 @@ window.Shared = (() => {
     { id: "terminal", name: "Retro Terminal", swatch: "#33ff33" },
     { id: "bubblegum", name: "Bubblegum", swatch: "#ff8fc7" },
     { id: "art-deco", name: "Art Deco", swatch: "#d4af37" },
+    { id: "tropical", name: "Tropical", swatch: "#1fc7b6" },
+    { id: "desert", name: "Desert", swatch: "#e07a3a" },
+    { id: "dessert", name: "Dessert", swatch: "#ff8fb4" },
   ];
 
   const THEME_KEY = "wordly:theme";

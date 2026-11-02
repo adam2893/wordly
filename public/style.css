@@ -1084,6 +1084,112 @@ html[data-theme="art-deco"] .key.absent {
   opacity: 1;
 }
 
+/* ---------- Tropical ---------- */
+/* Lagoon at dusk: deep teal, palm-leaf green correct tiles, mango present
+   tiles, rounded "pebble" tiles. */
+[data-theme="tropical"] {
+  --color-bg: #073a44;
+  --color-surface: #0b4a55;
+  --color-text: #f2fffb;
+  --color-text-dim: #9fd6cf;
+  --color-border: #1d6b72;
+  --color-border-strong: #4fd1c5;
+  --color-accent: #1fc7b6;
+  --color-on-accent: #04262b;
+
+  --color-correct: #34b86b;
+  --color-present: #ff9f2e;
+  --color-absent: #0a2f36;
+  --key-text-on-color: #ffffff;
+
+  --color-key-bg: #12707a;
+  --color-key-text: #f2fffb;
+  --color-modal-overlay: rgba(2, 24, 28, 0.7);
+  --color-danger: #ff5f6d;
+  --bee-center: #ff9f2e;
+  --bee-center-text: #3a1a00;
+}
+html[data-theme="tropical"] .tile,
+html[data-theme="tropical"] .key {
+  border-radius: 12px !important;
+}
+html[data-theme="tropical"] .tile.correct,
+html[data-theme="tropical"] .tile.present {
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* ---------- Desert ---------- */
+/* Sunset over the mesas: dark plum-brown base, sage cactus correct,
+   golden sand present, terracotta accents. */
+[data-theme="desert"] {
+  --color-bg: #26121f;
+  --color-surface: #351a29;
+  --color-text: #fbeedd;
+  --color-text-dim: #d3a98c;
+  --color-border: #5a3040;
+  --color-border-strong: #c47a52;
+  --color-accent: #e07a3a;
+  --color-on-accent: #2a1208;
+
+  --color-correct: #6f9a4f;
+  --color-present: #d9a441;
+  --color-absent: #1c0d17;
+  --key-text-on-color: #ffffff;
+
+  --color-key-bg: #6b3a3e;
+  --color-key-text: #fbeedd;
+  --color-modal-overlay: rgba(20, 8, 16, 0.75);
+  --color-danger: #e2553c;
+  --bee-center: #e07a3a;
+  --bee-center-text: #2a1208;
+}
+html[data-theme="desert"] .tile,
+html[data-theme="desert"] .key {
+  border-radius: 3px !important;
+}
+
+/* ---------- Dessert ---------- */
+/* Bakery case: cream base, chocolate text, pistachio correct, caramel
+   present, strawberry accent, soft rounded tiles. */
+[data-theme="dessert"] {
+  --color-bg: #fff6ea;
+  --color-surface: #ffffff;
+  --color-text: #4a2a1a;
+  --color-text-dim: #8a6450;
+  --color-border: #ecd5c0;
+  --color-border-strong: #b98a6a;
+  --color-accent: #ff6f9c;
+  --color-on-accent: #ffffff;
+
+  --color-correct: #8cc06a;
+  --color-present: #e7a64a;
+  --color-absent: #d9c8b6;
+  --key-text-on-color: #3a1f12;
+
+  --color-key-bg: #ffffff;
+  --color-key-text: #4a2a1a;
+  --color-modal-overlay: rgba(74, 42, 26, 0.4);
+  --color-danger: #d9475f;
+  --bee-center: #ff8fb4;
+  --bee-center-text: #4a2a1a;
+}
+html[data-theme="dessert"] .tile,
+html[data-theme="dessert"] .key {
+  border-radius: 14px !important;
+}
+html[data-theme="dessert"] .key {
+  box-shadow: 0 2px 0 #e2c3a6;
+}
+html[data-theme="dessert"] .app-header {
+  background: rgba(255, 246, 234, 0.94);
+  box-shadow: 0 4px 0 #5a3221;
+  border-bottom-color: #5a3221;
+}
+html[data-theme="dessert"] .tile.absent,
+html[data-theme="dessert"] .key.absent {
+  color: #8a6f5c !important;
+}
+
 /* Respect system preference until user picks explicitly */
 @media (prefers-color-scheme: light) {
   :root:not([data-theme]) {
@@ -1151,7 +1257,10 @@ body {
 [data-theme="halloween"] body,
 [data-theme="terminal"] body,
 [data-theme="bubblegum"] body,
-[data-theme="art-deco"] body {
+[data-theme="art-deco"] body,
+[data-theme="tropical"] body,
+[data-theme="desert"] body,
+[data-theme="dessert"] body {
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
@@ -1179,7 +1288,10 @@ body {
   [data-theme="halloween"] body,
   [data-theme="terminal"] body,
   [data-theme="bubblegum"] body,
-  [data-theme="art-deco"] body {
+  [data-theme="art-deco"] body,
+  [data-theme="tropical"] body,
+  [data-theme="desert"] body,
+  [data-theme="dessert"] body {
     background-size: contain;
     background-position: center top;
   }
@@ -1294,6 +1406,28 @@ body {
   background-image:
     linear-gradient(180deg, rgba(3, 4, 6, 0.8) 0, rgba(3, 4, 6, 0.35) 90px, rgba(3, 4, 6, 0.12) 220px),
     url("images/themes/art-deco.svg");
+}
+
+[data-theme="tropical"] body {
+  /* Hand-built SVG: lagoon at dusk, palms, hibiscus, beach. */
+  background-image:
+    linear-gradient(180deg, rgba(3, 30, 36, 0.55) 0, rgba(3, 30, 36, 0.15) 160px, rgba(3, 30, 36, 0.1) 100%),
+    url("images/themes/tropical.svg");
+}
+
+[data-theme="desert"] body {
+  /* Hand-built SVG: starry dusk over mesas and saguaros. */
+  background-image:
+    linear-gradient(180deg, rgba(18, 8, 20, 0.35) 0, rgba(18, 8, 20, 0.1) 200px, rgba(18, 8, 20, 0.35) 100%),
+    url("images/themes/desert.svg");
+}
+
+[data-theme="dessert"] body {
+  /* Hand-built SVG: chocolate drip, donuts, macarons, ice cream.
+     Light image + dark text, so a light wash instead of a dark scrim. */
+  background-image:
+    linear-gradient(rgba(255, 246, 234, 0.2), rgba(255, 246, 234, 0.2)),
+    url("images/themes/dessert.svg");
 }
 
 
