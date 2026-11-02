@@ -97,6 +97,13 @@ LATE_BLOCK = {
     "goddamn", "goddamned", "damn", "damned", "damning",
 }
 
+# The blocklists above are generic. When the NYT itself has accepted a word
+# ("anal", "nude", "crap", "nipple"...), its verdict wins over them - except
+# for these, which stay out no matter what. Petitions can't add them either.
+NEVER_ACCEPT = EXTRA_BLOCK | {
+    "negroid", "mulatto", "mulattoes", "nazi", "nazis", "heil", "heiled",
+}
+
 # Spelling Bee: how common a word must be to count as an answer. NYT only
 # accepts reasonably common words; 2.6 on wordfreq's Zipf scale keeps
 # everyday vocabulary while dropping Scrabble-only obscurities.
@@ -278,12 +285,15 @@ def main():
     def playable(w):
         return len(w) >= 4 and "s" not in w and len(set(w)) <= 7 and re.fullmatch(r"[a-z]+", w)
 
-    answers = {w for w in nyt_ok | untested if playable(w) and w not in blocked}
+    # NYT-accepted words skip the generic blocklists (NEVER_ACCEPT aside);
+    # words the NYT hasn't judged still have to clear them.
+    answers = {w for w in nyt_ok if playable(w) and w not in NEVER_ACCEPT}
+    answers |= {w for w in untested if playable(w) and w not in blocked}
     petition_add, petition_remove = read_petitions()
     for w in sorted(petition_add):
-        if not playable(w) or w in blocked:
-            print(f"petition skipped (has S, too short, too many letters, or blocked): {w}")
-    answers |= {w for w in petition_add if playable(w) and w not in blocked}
+        if not playable(w) or w in NEVER_ACCEPT:
+            print(f"petition skipped (has S, too short, too many letters, or never accepted): {w}")
+    answers |= {w for w in petition_add if playable(w) and w not in NEVER_ACCEPT}
     answers -= petition_remove
     bee_answers = sorted(answers)
     print(

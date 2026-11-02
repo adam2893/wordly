@@ -1444,11 +1444,14 @@ a.icon-btn {
   gap: var(--tile-gap);
   width: 100%;
   max-width: 360px;
-  flex: 1 1 auto;
-  min-height: 0;
-  max-height: 420px;
+  flex: 0 0 auto;
   margin: 0 auto;
   align-content: center;
+}
+
+/* fitBoard() in wordly.js sets --tile-size; letters scale with the tile. */
+.board .tile {
+  font-size: calc(var(--tile-size, 62px) * 0.44);
 }
 
 .name-gate {

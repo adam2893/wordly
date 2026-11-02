@@ -186,9 +186,43 @@
     boardEl.classList.remove("hidden");
     keyboardEl.parentElement.classList.remove("hidden");
     nameGateEl.classList.add("hidden");
+    fitBoard();
   }
 
   // ---------- rendering ----------
+
+  // Size tiles to whichever runs out first, width or height. Tiles are
+  // square, so sizing by width alone overflows onto the keyboard on short
+  // viewports (e.g. Chrome on Android with its toolbar at the bottom).
+  const BOARD_MAX_WIDTH = 360;
+  function fitBoard() {
+    if (!state || boardEl.classList.contains("hidden")) return;
+    const main = boardEl.parentElement;
+    const mcs = getComputedStyle(main);
+    const gap = parseFloat(getComputedStyle(boardEl).rowGap) || 0;
+    let availH = main.clientHeight - parseFloat(mcs.paddingTop) - parseFloat(mcs.paddingBottom);
+    if (!dailyTimerEl.classList.contains("hidden")) {
+      availH -= dailyTimerEl.offsetHeight + (parseFloat(mcs.rowGap) || 0);
+    }
+    const availW = Math.min(
+      BOARD_MAX_WIDTH,
+      main.clientWidth - parseFloat(mcs.paddingLeft) - parseFloat(mcs.paddingRight)
+    );
+    const cols = state.length;
+    const rows = state.maxGuesses;
+    const tile = Math.max(
+      16,
+      Math.floor(Math.min((availW - (cols - 1) * gap) / cols, (availH - (rows - 1) * gap) / rows))
+    );
+    boardEl.style.width = `${cols * tile + (cols - 1) * gap}px`;
+    boardEl.style.setProperty("--tile-size", `${tile}px`);
+  }
+
+  if ("ResizeObserver" in window) {
+    new ResizeObserver(() => fitBoard()).observe(boardEl.parentElement);
+  } else {
+    window.addEventListener("resize", fitBoard);
+  }
 
   function renderBoard() {
     boardEl.innerHTML = "";
@@ -231,6 +265,7 @@
       }
       boardEl.appendChild(row);
     }
+    fitBoard();
   }
 
   function getPattern(guess, target) {
@@ -351,11 +386,13 @@
       liveTimerInterval = null;
     }
     dailyTimerEl.classList.add("hidden");
+    fitBoard();
   }
 
   function startLiveTimer() {
     stopLiveTimer();
     dailyTimerEl.classList.remove("hidden");
+    fitBoard();
     const tick = () => {
       dailyTimerEl.textContent = formatTimer(Date.now() - state.startedAt);
     };

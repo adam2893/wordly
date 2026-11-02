@@ -64,6 +64,7 @@ jobs:
           curl -sf http://localhost:8080/wordly | grep -q "wordly.js" || (echo "/wordly page missing" && exit 1)
           curl -sf http://localhost:8080/bee | grep -q "bee.js" || (echo "/bee page missing" && exit 1)
           curl -sf http://localhost:8080/boxed | grep -q "boxed.js" || (echo "/boxed page missing" && exit 1)
+          curl -sf http://localhost:8080/connections | grep -q "connections.js" || (echo "/connections page missing" && exit 1)
           curl -sf -H "Accept-Encoding: gzip" -o /dev/null -D - http://localhost:8080/words-boxed.js | grep -qi "content-encoding: gzip" || (echo "large assets not gzipped" && exit 1)
 
           echo "Submitting a test score with time and luck..."
@@ -95,6 +96,14 @@ jobs:
           echo "$BOX" | grep -q '"words":2' || (echo "boxed submit unexpected: $BOX" && exit 1)
           XLB=$(curl -sf "http://localhost:8080/api/boxed/leaderboard?date=2020-01-01")
           echo "$XLB" | grep -q '"twoWordSolves":1' || (echo "boxed leaderboard unexpected: $XLB" && exit 1)
+
+          echo "Connections score + leaderboard..."
+          CON=$(curl -sf -X POST http://localhost:8080/api/connections/score \
+            -H "Content-Type: application/json" \
+            -d '{"name":"ci-smoke-test","date":"2020-01-01","solved":true,"mistakes":0,"groups":4,"timeMs":90000}')
+          echo "$CON" | grep -q '"solved":true' || (echo "connections submit unexpected: $CON" && exit 1)
+          CLB=$(curl -sf "http://localhost:8080/api/connections/leaderboard?date=2020-01-01")
+          echo "$CLB" | grep -q '"perfect":1' || (echo "connections leaderboard unexpected: $CLB" && exit 1)
 
           echo "Rate limiting kicks in on score spam..."
           CODE=200

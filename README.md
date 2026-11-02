@@ -1,6 +1,6 @@
 # Wordly
 
-A small, self-hosted word-game collection: a clean, mobile-friendly Wordle clone plus Spelling Bee and Letter Boxed style games. The home page (`/`) is a game menu showing today's progress in each game, and every game shares the same themes, player name, and leaderboard backend.
+A small, self-hosted word-game collection: a clean, mobile-friendly Wordle clone plus Spelling Bee, Letter Boxed, and Connections style games. The home page (`/`) is a game menu showing today's progress in each game, and every game shares the same themes, player name, and leaderboard backend.
 
 ## Games
 
@@ -32,6 +32,14 @@ A small, self-hosted word-game collection: a clean, mobile-friendly Wordle clone
 - **Daily** + **Practice** modes, **yesterday's solution**, and an active-play timer.
 - **Leaderboard**: *Today* (words, par, time — fewer words wins, time breaks ties) and *All-time* (solves, average words, fewest words, 2-word solves, at/under-par solves, best time, streaks). First solve of the day counts.
 
+### Connections (`/connections`)
+
+- 16 words, four hidden groups of four. Tap four words and Submit; four mistakes and you're out. "One away…" when three of the four belong together, and repeat guesses don't cost a mistake.
+- Groups are color-coded by difficulty (yellow → green → blue → purple). Purple groups are wordplay: hidden words, fill-in-the-blank compounds (___BALL, FIRE___), anagrams, words that start or end with something.
+- **Red herrings, but one answer**: words regularly fit a second group on the board, but every puzzle is checked at build time to have exactly one way to sort all 16 (see Dictionary below).
+- **Daily** puzzle shared by everyone (numbered from #1 on 2026-11-02), **Practice** plays any puzzle from the archive, **Yesterday's answers**, active-play timer, and a copyable emoji result grid.
+- **Leaderboard**: *Today* (solved, mistakes, time) and *All-time* (played, win %, perfect games, average mistakes, best time, streaks). First finished game of the day counts.
+
 ### Shared
 
 - **16 themes** — Dark, Light, Standard Neon, Neon City, Synthwave, Bubblegum 3D, Ocean, Sunset, Forest, Halloween, Christmas, Neon 80s, Spooky, Retro Terminal, Bubblegum, Art Deco — picked from the palette button on any page, saved across visits and games.
@@ -42,9 +50,9 @@ A small, self-hosted word-game collection: a clean, mobile-friendly Wordle clone
 Frontend is plain HTML/CSS/JS (`public/`), no build step, no framework. It's paired with a small zero-dependency Node backend (`server.js`, built-in `http`/`fs` only — no `npm install`, no `package.json`) that does two things:
 
 1. Serves the static frontend (gzip-compressed for text assets, with clean URLs like `/bee` → `bee.html`).
-2. Stores and aggregates leaderboard scores as JSON files in the data directory (`scores.json` for Wordly, `bee.json`, `boxed.json`), so results submitted from any device/browser are visible to everyone.
+2. Stores and aggregates leaderboard scores as JSON files in the data directory (`scores.json` for Wordly, `bee.json`, `boxed.json`, `connections.json`), so results submitted from any device/browser are visible to everyone.
 
-Shared frontend code (themes, player name, modals, dates, seeded RNG, stopwatch) lives in `public/common.js`; each game has its own `*.html` + `*.js`, with Spelling Bee / Letter Boxed styles in `public/games.css`.
+Shared frontend code (themes, player name, modals, dates, seeded RNG, stopwatch) lives in `public/common.js`; each game has its own `*.html` + `*.js`, with Spelling Bee / Letter Boxed / Connections styles in `public/games.css`.
 
 ### Rate limiting
 
@@ -103,11 +111,17 @@ Spelling Bee and Letter Boxed word lists (`public/words-bee.js`, `public/words-b
 
 - **Spelling Bee answers** (~21.8k) are modeled on the NYT's own list. Fan archives of past NYT puzzles ([tedmiston/spelling-bee-answers](https://github.com/tedmiston/spelling-bee-answers), [philshem/scrape_bee](https://github.com/philshem/scrape_bee), [bwillenbring/nytimes-bee](https://github.com/bwillenbring/nytimes-bee) — ~1,200 puzzles, 2019–2025) show which words the NYT accepted and, since every word that fit a puzzle but isn't in its answers was turned down, which it rejected. Each word takes its most recent NYT verdict (~9k accepted, ~6.5k rejected). Words the NYT has never judged fall back to our own list: common words ([wordfreq](https://pypi.org/project/wordfreq/)), well-known dictionary words ([SCOWL](http://wordlist.aspell.net/) size ≤55) and their inflections ([lemminflect](https://pypi.org/project/lemminflect/)). Backtested against a held-out year of NYT puzzles, this matches the NYT's answers to within ~0.4 extra and ~0.7 missing words per puzzle (the previous frequency-based list was off by ~5 extra and ~6.6 missing). No S, ever (same as NYT).
 - **Hives** are still picked from `BEE_WORDS`, a stable common-word list, so changing what counts as an answer never reshuffles a daily puzzle.
-- **Petitions**: `tools/bee-petitions.txt` — one word per line to accept a word regardless of the NYT's verdict, or `-word` to reject one. Re-run the build after editing.
-- **Offensive words**: the LDNOOBW list plus hand-kept `EXTRA_BLOCK` / `LATE_BLOCK` sets (slurs and crude words it misses) are excluded from every answer/solution list. Words blocked after launch go in `LATE_BLOCK`, which lists them in `BEE_AVOID` / `BOXED_AVOID` instead of removing them from the puzzle-picking lists, so blocking a word never reshuffles daily puzzles.
+- **Petitions**: `tools/bee-petitions.txt` — one word per line to accept a word regardless of the NYT's verdict (this also overrides the generic blocklists below), or `-word` to reject one. Re-run the build after editing.
+- **Offensive words**: the LDNOOBW list plus hand-kept `EXTRA_BLOCK` / `LATE_BLOCK` sets (slurs and crude words it misses) are excluded from every answer/solution list — *except* that a Spelling Bee word the NYT itself has accepted (ANAL, NUDE, NIPPLE, CRAP, POOP…) counts as an answer anyway. Slurs and hate terms (`NEVER_ACCEPT`) stay out no matter what. Words blocked after launch go in `LATE_BLOCK`, which lists them in `BEE_AVOID` / `BOXED_AVOID` instead of removing them from the puzzle-picking lists, so blocking a word never reshuffles daily puzzles.
 - **Letter Boxed valid words** (~131k): the full ENABLE list minus words with doubled letters (impossible to play). Solutions for generated puzzles come from a ~12k common-word subset.
 
 Re-run with `pip install wordfreq lemminflect && python3 tools/build_words.py` (needs network access to GitHub and SourceForge; downloads are cached in `tools/.cache`).
+
+Connections (`public/words-connections.js`) is generated by `tools/build_connections.py` from the category bank in `tools/connections-categories.txt` (~200 categories, each with the words that can be shown plus extra words that also fit it):
+
+- Each puzzle takes one category per difficulty and four words from each. It's only kept if the 16 words can be sorted into its four categories in **exactly one way**, and no other category in the bank covers four of the words (other than one of the puzzle's own groups), so there's never a second "correct" grouping. Wordplay categories carry a rule (`before:BALL`, `start:CAR CAB`, `contains:RED TAN`, `anagram:STEAL`…) that the checker also applies to every other word on the board — fill-in rules are checked against the ENABLE dictionary — so a stray SNOWMAN or hidden RED gets caught.
+- Among valid candidates it prefers ones with red herrings, and doesn't reuse a category until most of its difficulty tier has had a turn.
+- 1,000 puzzles are generated (~2¾ years of dailies, then it loops). Re-running the build **keeps existing puzzles** and only appends, so editing the bank never changes a puzzle someone has played; `--rebuild` starts over. Run `python3 tools/build_connections.py` (uses the same cached downloads as `build_words.py`).
 
 Wordly:
 

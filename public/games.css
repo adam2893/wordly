@@ -885,3 +885,259 @@ kbd {
   filter: drop-shadow(0 0 5px rgba(240, 100, 58, 0.7));
   opacity: 0.85;
 }
+
+/* ---------- Connections ---------- */
+/* Group colors are the game's signature, so they stay the same in every
+   theme (dark text on all four). */
+:root {
+  --conn-t0: #f9df6d;
+  --conn-t1: #a0c35a;
+  --conn-t2: #b0c4ef;
+  --conn-t3: #ba81c5;
+  --conn-on: #121213;
+}
+
+.conn-main {
+  justify-content: flex-start;
+}
+
+.conn-game {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.conn-top {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 1.4rem;
+}
+
+.conn-label {
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+/* Tile height scales with the viewport so the whole board, mistakes, and
+   buttons fit without scrolling, even with the browser toolbar at the
+   bottom of the screen. */
+.conn-board {
+  --conn-row: clamp(46px, calc((100dvh - 330px) / 4), 80px);
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: var(--conn-row);
+  gap: 8px;
+  container-type: inline-size;
+}
+
+.conn-tile {
+  min-width: 0;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-key-bg);
+  color: var(--color-key-text);
+  font-family: inherit;
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 1.1;
+  padding: 0 3px;
+  cursor: pointer;
+  user-select: none;
+  overflow-wrap: anywhere;
+  /* Each tile is ~a quarter of the board; shrink long words to fit. */
+  font-size: min(1.05rem, calc((25cqi - 14px) / (var(--len, 6) * 0.72)));
+  transition: background-color 0.12s ease, color 0.12s ease, transform 0.1s ease;
+}
+
+.conn-tile:active {
+  transform: scale(0.96);
+}
+
+.conn-tile.selected {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+.conn-tile.shake {
+  animation: game-shake 0.4s ease;
+}
+
+.conn-group {
+  grid-column: 1 / -1;
+  border-radius: 8px;
+  color: var(--conn-on);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.2rem 0.5rem;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.conn-answers .conn-group {
+  min-height: 3.6rem;
+  margin-bottom: 8px;
+}
+
+.conn-group-name {
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+}
+
+.conn-group-words {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.conn-group.t0, .conn-sq.t0, .conn-sw.t0 { background: var(--conn-t0); }
+.conn-group.t1, .conn-sq.t1, .conn-sw.t1 { background: var(--conn-t1); }
+.conn-group.t2, .conn-sq.t2, .conn-sw.t2 { background: var(--conn-t2); }
+.conn-group.t3, .conn-sq.t3, .conn-sw.t3 { background: var(--conn-t3); }
+
+.conn-group.pop {
+  animation: conn-pop 0.35s ease;
+}
+
+.conn-group.revealed {
+  animation: conn-pop 0.35s ease both;
+}
+
+.conn-group.revealed:nth-child(2) { animation-delay: 0.15s; }
+.conn-group.revealed:nth-child(3) { animation-delay: 0.3s; }
+.conn-group.revealed:nth-child(4) { animation-delay: 0.45s; }
+
+@keyframes conn-pop {
+  0% { transform: scale(0.94); opacity: 0.4; }
+  60% { transform: scale(1.02); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+.conn-mistakes {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.conn-dots {
+  display: inline-flex;
+  gap: 0.45rem;
+}
+
+.conn-dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  background: var(--color-text);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.conn-dot.used {
+  transform: scale(0);
+  opacity: 0;
+}
+
+.conn-controls .pill-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.conn-submit:not(:disabled) {
+  background: var(--color-text);
+  color: var(--color-bg);
+  border-color: var(--color-text);
+}
+
+.conn-label,
+.conn-mistakes {
+  text-shadow: 0 0 4px var(--color-bg), 0 0 8px var(--color-bg), 0 1px 2px var(--color-bg);
+}
+
+.conn-share-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 0.5rem 0 1rem;
+}
+
+.conn-share-row {
+  display: flex;
+  gap: 4px;
+}
+
+.conn-sq {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 4px;
+}
+
+.conn-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--color-text-dim);
+}
+
+.conn-sw {
+  display: inline-block;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 3px;
+}
+
+#share-btn {
+  margin-bottom: 0.5rem;
+}
+
+@media (max-height: 700px) {
+  .conn-game {
+    gap: 0.4rem;
+  }
+  .conn-board {
+    --conn-row: clamp(42px, calc((100dvh - 290px) / 4), 80px);
+    gap: 6px;
+  }
+  .conn-group-name {
+    font-size: 0.85rem;
+  }
+  .conn-group-words {
+    font-size: 0.75rem;
+  }
+}
+
+/* Menu icon: four colored rows. */
+.icon-connections {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  align-items: stretch;
+  justify-items: stretch;
+  gap: 3px;
+  padding: 0.45rem;
+}
+
+.icon-connections .c {
+  border-radius: 3px;
+  background: var(--color-key-bg);
+}
+
+.icon-connections .c.bar {
+  grid-column: 1 / -1;
+}
+
+.icon-connections .c.t0 {
+  background: var(--conn-t0);
+}
