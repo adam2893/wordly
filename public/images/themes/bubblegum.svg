@@ -10,9 +10,9 @@
 <pattern id="stripes" width="80" height="80" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="80" height="80" fill="#ffffff"/><rect width="40" height="80" fill="#ff8fc7"/></pattern></defs>
 <rect width="1080" height="1920" fill="url(#bg)"/>
 <rect width="1080" height="1920" fill="url(#dots)"/>
-<path fill="#ffffff" stroke="#5a2a52" stroke-width="6" d="M-20,0 L-20,150 a68.6,54.9 0 0 0 137.1,0 a71.8,57.4 0 0 0 143.6,0 a82.7,66.2 0 0 0 165.5,0 a69,55.2 0 0 0 137.9,0 a70.2,56.2 0 0 0 140.5,0 a72.6,58.1 0 0 0 145.2,0 a60.5,48.4 0 0 0 121.1,0 a70.4,56.3 0 0 0 140.7,0 L1111.6,0 Z"/>
-<rect x="664.3" y="1550.6" width="32" height="10" rx="5" fill="#ffd479" stroke="#5a2a52" stroke-width="2.5" transform="rotate(16.9 680.3 1555.6)"/>
-<rect x="945.6" y="1271.6" width="32" height="10" rx="5" fill="#c7a8ff" stroke="#5a2a52" stroke-width="2.5" transform="rotate(107.2 961.6 1276.6)"/>
+<rect x="982.1" y="974.5" width="32" height="10" rx="5" fill="#8fd3ff" stroke="#5a2a52" stroke-width="2.5" transform="rotate(91.4 998.1 979.5)"/>
+<rect x="189.1" y="1569.9" width="32" height="10" rx="5" fill="#8fd3ff" stroke="#5a2a52" stroke-width="2.5" transform="rotate(85.6 205.1 1574.9)"/>
+<rect x="858.4" y="1375.5" width="32" height="10" rx="5" fill="#c7a8ff" stroke="#5a2a52" stroke-width="2.5" transform="rotate(7.5 874.4 1380.5)"/>
 <rect x="1025.9" y="1305.9" width="32" height="10" rx="5" fill="#8fd9a8" stroke="#5a2a52" stroke-width="2.5" transform="rotate(110.8 1041.9 1310.9)"/>
 <rect x="657" y="1618.8" width="32" height="10" rx="5" fill="#ff8fc7" stroke="#5a2a52" stroke-width="2.5" transform="rotate(11.4 673 1623.8)"/>
 <rect x="16.5" y="971.5" width="32" height="10" rx="5" fill="#8fd9a8" stroke="#5a2a52" stroke-width="2.5" transform="rotate(79.3 32.5 976.5)"/>

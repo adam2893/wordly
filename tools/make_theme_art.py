@@ -96,15 +96,8 @@ def bubblegum():
 """
     b = [f'<rect width="{W}" height="{H}" fill="url(#bg)"/>', f'<rect width="{W}" height="{H}" fill="url(#dots)"/>']
 
-    # scalloped cloud band across the top
-    top = [f'<path fill="#ffffff" stroke="{ink}" stroke-width="6" d="M-20,0 L-20,150']
-    x = -20
-    while x < W + 20:
-        r = rnd.uniform(55, 85)
-        top.append(f" a{f(r)},{f(r * 0.8)} 0 0 0 {f(r * 2)},0")
-        x += r * 2
-    top.append(f' L{f(x)},0 Z"/>')
-    b.append("".join(top))
+    # (the scalloped cloud band is drawn in CSS on the header, so it lines
+    # up with the title row at every screen size)
 
     def bubble(cx, cy, r, color):
         return (
