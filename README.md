@@ -1,22 +1,24 @@
 # Wordly
 
-A small, self-hosted word-game collection: a clean, mobile-friendly Wordle clone plus Spelling Bee, Letter Boxed, and Connections style games. The home page (`/`) is a game menu showing today's progress in each game, and every game shares the same themes, player name, and leaderboard backend.
+<img src="icon.png" alt="Wordly icon" width="96" align="right">
+
+A small, self-hosted collection of daily word games: **Wordly** (guess the 5 or 6 letter word), **Spelly Bee**, **Boxy Letters**, and **Connecty**. Mobile-friendly, no accounts, shared leaderboards for everyone on your server. The home page (`/`) is a game menu showing today's progress in each game, and every game shares the same themes, player name, and leaderboard backend.
 
 ## Games
 
 ### Wordly (`/wordly`)
 
-- **5 or 6 letter mode** — toggle in the header, adjusts guess count (6 tries for 5-letter, 7 for 6-letter, matching Wordle's own word-length + 1 convention).
-- **Daily Challenge** — everyone gets the same word each day (per length), computed deterministically from the date so it resets automatically at local midnight, same as real Wordle. No server round-trip needed to pick it.
+- **5 or 6 letter mode** — toggle in the header, adjusts guess count (6 tries for 5-letter, 7 for 6-letter, word length + 1).
+- **Daily Challenge** — everyone gets the same word each day (per length), computed deterministically from the date so it resets automatically at local midnight. No server round-trip needed to pick it.
 - **Practice mode** — unlimited random-word games, doesn't touch the leaderboard.
 - **Leaderboard** — games played, win %, current streak, best streak, average guesses, best time, and average luck, separately for 5- and 6-letter.
 - **Speed timer** — starts on your first keystroke each Daily game, shown live above the board, recorded on completion, and tracked on the leaderboard as each player's best time.
 - **Luck rating** — on a win, shows how many answer-pool words were still possible right before your winning guess. Solve it in few guesses despite a wide-open field and you'll score high on luck; narrow it down methodically and you'll score low ("All Skill"). Averaged per player on the leaderboard.
 - A **huge valid-word dictionary** (8,645 five-letter / 15,232 six-letter words) so common guesses never get rejected, while the daily/practice *answer* always comes from a smaller curated common-word list (2,315 / 1,233 words) so the puzzle itself stays fair and guessable.
 
-### Spelling Bee (`/bee`)
+### Spelly Bee (`/bee`)
 
-- Make words from a 7-letter hive; every word needs the center letter and at least 4 letters. NYT scoring: 1 point for 4-letter words, 1 per letter above that, +7 for a **pangram** (uses all 7 letters).
+- Make words from a 7-letter hive; every word needs the center letter and at least 4 letters. Scoring: 1 point for 4-letter words, 1 per letter above that, +7 for a **pangram** (uses all 7 letters).
 - Ranks from Beginner to **Genius** (70%) and **Queen Bee** (every word). Tap the rank bar for the thresholds.
 - **Daily** hive shared by everyone (resets at midnight), re-rolled until it has 20–70 answers so no day is a dud; **Practice** for unlimited random hives, with a "Reveal answers" button.
 - **Yesterday's answers**, with the words you found ticked off.
@@ -24,15 +26,15 @@ A small, self-hosted word-game collection: a clean, mobile-friendly Wordle clone
 - **Leaderboard**: *Today* (score, rank, words, pangrams, Genius time) and *All-time* (days played, average % of max, Genius days, Queen Bee days, pangrams, streak, best Genius time). Scores submit as you play (debounced).
 - Keyboard: type letters, Enter, Backspace, Space to shuffle.
 
-### Letter Boxed (`/boxed`)
+### Boxy Letters (`/boxed`)
 
 - 12 letters, 3 per side of a square. Words chain end-to-start, consecutive letters must come from different sides, and the goal is to use all 12 letters in as few words as possible.
 - Each daily box is generated around a real two-word solution from common words, so a 2-word solve is always possible. A **par** (4–6 words) is set based on how many 2-word solutions exist.
-- Delete past the start of a word to reopen the previous one (NYT behavior); Restart clears everything.
+- Delete past the start of a word to reopen the previous one; Restart clears everything.
 - **Daily** + **Practice** modes, **yesterday's solution**, and an active-play timer.
 - **Leaderboard**: *Today* (words, par, time — fewer words wins, time breaks ties) and *All-time* (solves, average words, fewest words, 2-word solves, at/under-par solves, best time, streaks). First solve of the day counts.
 
-### Connections (`/connections`)
+### Connecty (`/connections`)
 
 - 16 words, four hidden groups of four. Tap four words and Submit; four mistakes and you're out. "One away…" when three of the four belong together, and repeat guesses don't cost a mistake.
 - Groups are color-coded by difficulty (yellow → green → blue → purple). Purple groups are wordplay: hidden words, fill-in-the-blank compounds (___BALL, FIRE___), anagrams, words that start or end with something.
@@ -52,7 +54,7 @@ Frontend is plain HTML/CSS/JS (`public/`), no build step, no framework. It's pai
 1. Serves the static frontend (gzip-compressed for text assets, with clean URLs like `/bee` → `bee.html`).
 2. Stores and aggregates leaderboard scores as JSON files in the data directory (`scores.json` for Wordly, `bee.json`, `boxed.json`, `connections.json`), so results submitted from any device/browser are visible to everyone.
 
-Shared frontend code (themes, player name, modals, dates, seeded RNG, stopwatch) lives in `public/common.js`; each game has its own `*.html` + `*.js`, with Spelling Bee / Letter Boxed / Connections styles in `public/games.css`.
+Shared frontend code (themes, player name, modals, dates, seeded RNG, stopwatch) lives in `public/common.js`; each game has its own `*.html` + `*.js`, with Spelly Bee / Boxy Letters / Connecty styles in `public/games.css`.
 
 ### Rate limiting
 
@@ -85,13 +87,13 @@ powershell -File .devserver/serve.ps1 -Port 5173
 A `Dockerfile` (Node 20 alpine) and a GitHub Actions workflow (`.github/workflows/docker-publish.yml`) are included. Every push to `main` builds, smoke-tests, and publishes a multi-arch image to GitHub Container Registry at:
 
 ```
-ghcr.io/<your-github-username>/wordle-custom:latest
+ghcr.io/jakeshake/wordly:latest
 ```
 
 To run it on Unraid:
 
 1. **Docker tab → Add Container.**
-2. **Repository**: `ghcr.io/<your-github-username>/wordle-custom:latest`
+2. **Repository**: `ghcr.io/jakeshake/wordly:latest`
 3. **Port**: map container port `80` to whatever host port you want (e.g. `8080`).
 4. **Path**: map container path `/data` to a host appdata folder (e.g. `/mnt/user/appdata/wordly`) — **this is what makes the leaderboard persist** across container restarts/updates. Without it, scores reset every time the container is recreated.
 5. Apply — Unraid pulls the image and starts it. Visit `http://<unraid-ip>:8080`.
@@ -107,17 +109,17 @@ docker run -p 8080:80 -v wordly-data:/data wordly
 
 ## Dictionary
 
-Spelling Bee and Letter Boxed word lists (`public/words-bee.js`, `public/words-boxed.js`) are generated by `tools/build_words.py` from the ENABLE list, filtered by word frequency ([wordfreq](https://pypi.org/project/wordfreq/)) and an offensive-word blocklist:
+Spelly Bee and Boxy Letters word lists (`public/words-bee.js`, `public/words-boxed.js`) are generated by `tools/build_words.py` from the ENABLE list, filtered by word frequency ([wordfreq](https://pypi.org/project/wordfreq/)) and an offensive-word blocklist:
 
-- **Spelling Bee answers** (~21.8k) are modeled on the NYT's own list. Fan archives of past NYT puzzles ([tedmiston/spelling-bee-answers](https://github.com/tedmiston/spelling-bee-answers), [philshem/scrape_bee](https://github.com/philshem/scrape_bee), [bwillenbring/nytimes-bee](https://github.com/bwillenbring/nytimes-bee) — ~1,200 puzzles, 2019–2025) show which words the NYT accepted and, since every word that fit a puzzle but isn't in its answers was turned down, which it rejected. Each word takes its most recent NYT verdict (~9k accepted, ~6.5k rejected). Words the NYT has never judged fall back to our own list: common words ([wordfreq](https://pypi.org/project/wordfreq/)), well-known dictionary words ([SCOWL](http://wordlist.aspell.net/) size ≤55) and their inflections ([lemminflect](https://pypi.org/project/lemminflect/)). Backtested against a held-out year of NYT puzzles, this matches the NYT's answers to within ~0.4 extra and ~0.7 missing words per puzzle (the previous frequency-based list was off by ~5 extra and ~6.6 missing). No S, ever (same as NYT).
+- **Spelly Bee answers** (~21.8k) are modeled on the NYT's own list. Fan archives of past NYT puzzles ([tedmiston/spelling-bee-answers](https://github.com/tedmiston/spelling-bee-answers), [philshem/scrape_bee](https://github.com/philshem/scrape_bee), [bwillenbring/nytimes-bee](https://github.com/bwillenbring/nytimes-bee) — ~1,200 puzzles, 2019–2025) show which words the NYT accepted and, since every word that fit a puzzle but isn't in its answers was turned down, which it rejected. Each word takes its most recent NYT verdict (~9k accepted, ~6.5k rejected). Words the NYT has never judged fall back to our own list: common words ([wordfreq](https://pypi.org/project/wordfreq/)), well-known dictionary words ([SCOWL](http://wordlist.aspell.net/) size ≤55) and their inflections ([lemminflect](https://pypi.org/project/lemminflect/)). Backtested against a held-out year of NYT puzzles, this matches the NYT's answers to within ~0.4 extra and ~0.7 missing words per puzzle (the previous frequency-based list was off by ~5 extra and ~6.6 missing). No S, ever (same as NYT).
 - **Hives** are still picked from `BEE_WORDS`, a stable common-word list, so changing what counts as an answer never reshuffles a daily puzzle.
 - **Petitions**: `tools/bee-petitions.txt` — one word per line to accept a word regardless of the NYT's verdict (this also overrides the generic blocklists below), or `-word` to reject one. Re-run the build after editing.
-- **Offensive words**: the LDNOOBW list plus hand-kept `EXTRA_BLOCK` / `LATE_BLOCK` sets (slurs and crude words it misses) are excluded from every answer/solution list — *except* that a Spelling Bee word the NYT itself has accepted (ANAL, NUDE, NIPPLE, CRAP, POOP…) counts as an answer anyway. Slurs and hate terms (`NEVER_ACCEPT`) stay out no matter what. Words blocked after launch go in `LATE_BLOCK`, which lists them in `BEE_AVOID` / `BOXED_AVOID` instead of removing them from the puzzle-picking lists, so blocking a word never reshuffles daily puzzles.
-- **Letter Boxed valid words** (~131k): the full ENABLE list minus words with doubled letters (impossible to play). Solutions for generated puzzles come from a ~12k common-word subset.
+- **Offensive words**: the LDNOOBW list plus hand-kept `EXTRA_BLOCK` / `LATE_BLOCK` sets (slurs and crude words it misses) are excluded from every answer/solution list — *except* that a Spelly Bee word the NYT itself has accepted (ANAL, NUDE, NIPPLE, CRAP, POOP…) counts as an answer anyway. Slurs and hate terms (`NEVER_ACCEPT`) stay out no matter what. Words blocked after launch go in `LATE_BLOCK`, which lists them in `BEE_AVOID` / `BOXED_AVOID` instead of removing them from the puzzle-picking lists, so blocking a word never reshuffles daily puzzles.
+- **Boxy Letters valid words** (~131k): the full ENABLE list minus words with doubled letters (impossible to play). Solutions for generated puzzles come from a ~12k common-word subset.
 
 Re-run with `pip install wordfreq lemminflect && python3 tools/build_words.py` (needs network access to GitHub and SourceForge; downloads are cached in `tools/.cache`).
 
-Connections (`public/words-connections.js`) is generated by `tools/build_connections.py` from the category bank in `tools/connections-categories.txt` (~200 categories, each with the words that can be shown plus extra words that also fit it):
+Connecty (`public/words-connections.js`) is generated by `tools/build_connections.py` from the category bank in `tools/connections-categories.txt` (~200 categories, each with the words that can be shown plus extra words that also fit it):
 
 - Each puzzle takes one category per difficulty and four words from each. It's only kept if the 16 words can be sorted into its four categories in **exactly one way**, and no other category in the bank covers four of the words (other than one of the puzzle's own groups), so there's never a second "correct" grouping. Wordplay categories carry a rule (`before:BALL`, `start:CAR CAB`, `contains:RED TAN`, `anagram:STEAL`…) that the checker also applies to every other word on the board — fill-in rules are checked against the ENABLE dictionary — so a stray SNOWMAN or hidden RED gets caught.
 - Among valid candidates it prefers ones with red herrings, and doesn't reuse a category until most of its difficulty tier has had a turn.
@@ -126,11 +128,11 @@ Connections (`public/words-connections.js`) is generated by `tools/build_connect
 Wordly:
 
 - **Valid guesses** (`GUESSES[5]`, `GUESSES[6]` in `public/words.js`): a large Scrabble-style word-game dictionary (ENABLE word list), ~8.6k five-letter and ~15.2k six-letter words. This is what guesses are checked against, so legitimate everyday words are essentially never rejected.
-- **Possible answers** (`ANSWERS[5]`, `ANSWERS[6]`): the curated common-word lists from the original build — the real 2,314-word Wordle answer list for 5 letters, and a manually-screened ~1,233-word list for 6 letters. Daily and Practice answers are always picked from here, so the puzzle stays solvable/fair. `ANSWERS` is a subset of `GUESSES`, guaranteed at build time.
+- **Possible answers** (`ANSWERS[5]`, `ANSWERS[6]`): the curated common-word lists from the original build — a curated 2,314-word list of common words for 5 letters, and a manually-screened ~1,233-word list for 6 letters. Daily and Practice answers are always picked from here, so the puzzle stays solvable/fair. `ANSWERS` is a subset of `GUESSES`, guaranteed at build time.
 
 ## Customizing
 
-- **Add a theme**: add a `[data-theme="yourname"]` block in `public/style.css` with the same CSS custom properties as the existing themes, then add `{ id, name, swatch }` to the `THEMES` array at the top of `public/common.js`. Optionally set `--bee-center` / `--bee-center-text` if the theme's `--color-present` doesn't stand out as the Spelling Bee center hex.
+- **Add a theme**: add a `[data-theme="yourname"]` block in `public/style.css` with the same CSS custom properties as the existing themes, then add `{ id, name, swatch }` to the `THEMES` array at the top of `public/common.js`. Optionally set `--bee-center` / `--bee-center-text` if the theme's `--color-present` doesn't stand out as the Spelly Bee center hex.
 - **Add a length**: add `GUESSES[n]` and `ANSWERS[n]` arrays in `public/words.js`, a `<button class="len-btn" data-len="n">n</button>` in `index.html`'s `.length-toggle`, and the board/keyboard/daily logic handles the rest automatically (max guesses = length + 1).
 - **Change the daily reset time or make it shared across timezones**: `todayDateString()` in `public/common.js` uses the browser's local date. Switch it to a fixed UTC-based string if you'd rather everyone share one global reset time regardless of timezone.
 
@@ -147,3 +149,23 @@ Convention:
 - Each wired theme pairs its image with a `linear-gradient(...)` scrim tuned to that image's brightness, layered in the same `background-image` declaration, so tiles/keys (which always paint a solid theme color) and header text stay legible on top.
 
 To add one for a theme that doesn't have it yet: drop the image in this folder, then add its `[data-theme="..."] body { background-image: linear-gradient(...), url("images/themes/yourfile"); }` rule alongside the others, and add the theme's selector to the shared `background-size/position/repeat` rule above them.
+
+## Unraid
+
+Wordly is listed in Unraid's Community Applications (search for **Wordly** in the Apps tab). The template lives in [`templates/wordly.xml`](templates/wordly.xml).
+
+## Versions
+
+Every push to `main` publishes `ghcr.io/jakeshake/wordly:latest`. Release tags (`v1.0.0`, ...) also publish `:1.0.0` and `:1.0`, so you can pin a version.
+
+## Credits
+
+- Word data: [ENABLE](https://github.com/dolph/dictionary) (public domain), [wordfreq](https://github.com/rspeer/wordfreq), [SCOWL](http://wordlist.aspell.net/), [lemminflect](https://github.com/bjascob/LemmInflect), and the [LDNOOBW](https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words) list.
+- Several theme backgrounds are wallpapers collected from the web. If you own one of them and want it credited or removed, please [open an issue](https://github.com/jakeshake/wordly/issues) and it will be taken care of promptly.
+- Wordly is an independent project and is not affiliated with or endorsed by The New York Times.
+
+## License
+
+[MIT](LICENSE)
+
+If you enjoy Wordly, you can [buy me a coffee](https://buymeacoffee.com/jakeshake).

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<CommunityApplications>
+  <Profile>
+**Wordly** by jakeshake: a self-hosted collection of daily word games for your household or friends.
+
+- **Wordly**: guess the hidden 5 or 6 letter word in six or seven tries.
+- **Spelly Bee**: make as many words as you can from seven letters.
+- **Boxy Letters**: chain words around a square to use all twelve letters.
+- **Connecty**: sort sixteen words into four hidden groups.
+
+Everyone on your server gets the same daily puzzles, with shared leaderboards, a practice mode, and 19 themes. Support and bug reports: open an issue on GitHub.
+  </Profile>
+  <Icon>https://raw.githubusercontent.com/jakeshake/wordly/main/icon.png</Icon>
+  <WebPage>https://github.com/jakeshake/wordly</WebPage>
+  <DonateLink>https://buymeacoffee.com/jakeshake</DonateLink>
+  <DonateText>Enjoying Wordly? Buy me a coffee</DonateText>
+</CommunityApplications>
