@@ -364,7 +364,7 @@
   }
 
   function shareText() {
-    const head = state.mode === "daily" ? `Connections #${dayNumber(state.date) + 1}` : `Connections practice #${state.index + 1}`;
+    const head = state.mode === "daily" ? `Connecty #${dayNumber(state.date) + 1}` : `Connecty practice #${state.index + 1}`;
     const rows = guessRows(state).map((r) => r.map((t) => EMOJI[t]).join(""));
     return `${head}\n${rows.join("\n")}`;
   }

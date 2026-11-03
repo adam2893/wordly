@@ -98,7 +98,7 @@
       const sides = dealSides([a, b], rand);
       if (sides) return makePuzzle(sides, [a, b]);
     }
-    throw new Error("could not build a Letter Boxed puzzle");
+    throw new Error("could not build a Boxy Letters puzzle");
   }
 
   function makePuzzle(sides, solution) {

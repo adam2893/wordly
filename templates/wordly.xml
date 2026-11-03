@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>Wordly</Name>
+  <Repository>ghcr.io/jakeshake/wordly:latest</Repository>
+  <Registry>https://github.com/jakeshake/wordly/pkgs/container/wordly</Registry>
+  <Network>bridge</Network>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Icon>https://raw.githubusercontent.com/jakeshake/wordly/main/icon.png</Icon>
+  <WebUI>http://[IP]:[PORT:80]/</WebUI>
+  <Overview>Self-hosted daily word games with shared leaderboards: Wordly (guess the 5 or 6 letter word), Spelly Bee (make words from seven letters), Boxy Letters (chain words around a square) and Connecty (sort sixteen words into four groups). Everyone on your server gets the same daily puzzles, plus practice mode, a timer, and 19 themes. Mobile-friendly, no accounts: players just pick a name. Map /data to appdata so leaderboards survive updates.</Overview>
+  <Project>https://github.com/jakeshake/wordly</Project>
+  <Support>https://github.com/jakeshake/wordly/issues</Support>
+  <TemplateURL>https://raw.githubusercontent.com/jakeshake/wordly/main/templates/wordly.xml</TemplateURL>
+  <ReadMe>https://raw.githubusercontent.com/jakeshake/wordly/main/README.md</ReadMe>
+  <DonateText>Enjoying Wordly? Buy me a coffee</DonateText>
+  <DonateLink>https://buymeacoffee.com/jakeshake</DonateLink>
+  <Category>Other:</Category>
+  <ExtraSearchTerms>word game puzzle daily guess anagram hive family leaderboard</ExtraSearchTerms>
+  <Changes>### 1.0.0
+Initial release: Wordly, Spelly Bee, Boxy Letters and Connecty with daily and practice modes, leaderboards and 19 themes.</Changes>
+  <Config Name="Web UI port" Target="80" Default="8080" Mode="tcp" Description="Port to open Wordly on." Type="Port" Display="always" Required="true" Mask="false">8080</Config>
+  <Config Name="Data" Target="/data" Default="/mnt/user/appdata/wordly" Mode="rw" Description="Leaderboard scores are stored here. Keep this mapped so they survive container updates." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/wordly</Config>
+  <Config Name="TRUST_PROXY" Target="TRUST_PROXY" Default="" Mode="" Description="Set to 1 if Wordly sits behind a reverse proxy or Cloudflare Tunnel, so rate limits use each player's real IP. Leave empty if players connect directly." Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+  <Config Name="RATE_LIMIT_WRITES" Target="RATE_LIMIT_WRITES" Default="30" Mode="" Description="Score submissions allowed per IP per minute." Type="Variable" Display="advanced" Required="false" Mask="false">30</Config>
+  <Config Name="RATE_LIMIT_READS" Target="RATE_LIMIT_READS" Default="120" Mode="" Description="Leaderboard reads allowed per IP per minute." Type="Variable" Display="advanced" Required="false" Mask="false">120</Config>
+</Container>
