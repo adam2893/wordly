@@ -391,9 +391,9 @@ html[data-theme="christmas"] .key.present {
 }
 
 html[data-theme="christmas"] .key.absent {
-  background: #5a121d !important;
-  color: #d19ca4 !important;
-  opacity: 0.8;
+  background: #123018 !important;
+  border: 2px solid #5a121d !important;
+  color: #a8c9ac !important;
 }
 
 /* ---------- Spooky ---------- */
@@ -447,9 +447,9 @@ html[data-theme="spooky"] .key.present {
 }
 
 html[data-theme="spooky"] .key.absent {
-  background: #2a1838 !important; /* Darker Purple for absent keys */
-  color: #9f86b5 !important;
-  opacity: 0.8;
+  background: #0d140f !important;
+  border: 2px solid #2a1838 !important;
+  color: #7fa88a !important;
 }
 
 /* ---------- 3D Glossy Bubblegum ---------- */
@@ -1299,9 +1299,12 @@ body {
 }
 
 [data-theme="christmas"] body {
+  /* User-supplied photo: log cabin at Christmas with a fireplace, lit
+     tree and snowy window. A darker band behind the header; a lighter
+     warm-dark wash elsewhere so the glow still shows through. */
   background-image:
-    linear-gradient(rgba(4, 12, 7, 0.4), rgba(4, 12, 7, 0.4)),
-    url("images/themes/christmas.jpg");
+    linear-gradient(180deg, rgba(14, 8, 4, 0.65) 0%, rgba(14, 8, 4, 0.35) 12%, rgba(14, 8, 4, 0.3) 100%),
+    url("images/themes/christmas.webp");
 }
 
 [data-theme="spooky"] body {
@@ -1748,6 +1751,14 @@ a.icon-btn {
 .key.correct { background: var(--color-correct); color: var(--key-text-on-color); }
 .key.present { background: var(--color-present); color: var(--key-text-on-color); }
 .key.absent { background: var(--color-absent); color: var(--color-text); opacity: 0.7; }
+
+/* Absent keys are fully opaque in every theme, so they show the same color
+   as an absent tile instead of letting the background image bleed through
+   (theme blocks above set the colors; this only settles the opacity). */
+html[data-theme] .key.absent,
+.key.absent {
+  opacity: 1 !important;
+}
 
 /* ---------- Toast ---------- */
 .toast-container {

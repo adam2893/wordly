@@ -115,16 +115,20 @@ def bubblegum():
             f'<circle cx="{f(cx + r * 0.1)}" cy="{f(cy - r * 0.68)}" r="{f(max(4, r * 0.07))}" fill="#ffffff"/>'
         )
 
+    # Nothing busy behind the header and controls: the top bubbles sit out
+    # at the edges, below the button rows.
     bubbles = [
-        (130, 330, 120, palette[0]), (930, 300, 95, palette[4]), (720, 420, 50, palette[2]),
-        (330, 470, 38, palette[3]), (1010, 640, 60, palette[1]), (60, 720, 45, palette[2]),
+        (40, 640, 95, palette[0]), (1045, 600, 80, palette[4]), (60, 820, 40, palette[2]),
         (150, 1530, 110, palette[1]), (960, 1480, 130, palette[3]), (560, 1640, 70, palette[5]),
         (780, 1720, 40, palette[0]), (330, 1320, 34, palette[4]),
     ]
     # sprinkles everywhere except the board's middle band
+    # sprinkles only in the lower part of the screen, away from the board
     for _ in range(140):
         sx, sy = rnd.uniform(0, W), rnd.uniform(160, H)
-        if 820 < sy < 1260 and 120 < sx < 960:
+        if sy < 1260 and 120 < sx < 960:
+            continue
+        if sy < 700:
             continue
         ang = rnd.uniform(0, 180)
         c = rnd.choice(palette)

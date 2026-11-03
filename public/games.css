@@ -952,7 +952,7 @@ kbd {
   user-select: none;
   overflow-wrap: anywhere;
   /* Each tile is ~a quarter of the board; shrink long words to fit. */
-  font-size: min(1.05rem, calc((25cqi - 14px) / (var(--len, 6) * 0.72)));
+  font-size: min(1.05rem, calc((25cqi - 14px) / (var(--len, 6) * 0.82)));
   transition: background-color 0.12s ease, color 0.12s ease, transform 0.1s ease;
 }
 
