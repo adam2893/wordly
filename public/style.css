@@ -951,6 +951,28 @@ html[data-theme="terminal"] .key.absent {
   --color-danger: #e0556f;
 }
 
+/* Scalloped cloud behind the title row. Drawn here rather than in the
+   background art so it lines up with the header at every screen size and
+   never reaches the control buttons below it. */
+html[data-theme="bubblegum"] .title-row {
+  position: relative;
+  background: #ffffff;
+  margin: -0.35rem -0.6rem 0.45rem;
+  padding: 0.35rem 0.6rem 0.1rem;
+}
+html[data-theme="bubblegum"] .title-row::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 9px;
+  background: radial-gradient(circle at 11px 0, #ffffff 0 8px, #5a2a52 8.5px 10.5px, transparent 11px) 0 0 / 22px 11px repeat-x;
+  pointer-events: none;
+}
+html[data-theme="bubblegum"] .app-header {
+  border-bottom-color: transparent;
+}
 html[data-theme="bubblegum"] .tile {
   background: #ffffff !important;
   border: 3px solid #5a2a52 !important;
