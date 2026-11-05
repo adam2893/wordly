@@ -4,6 +4,32 @@
 
 A small, self-hosted collection of daily word games: **Wordly** (guess the 5 or 6 letter word), **Spelly Bee**, **Boxy Letters**, and **Connecty**. Mobile-friendly, no accounts, shared leaderboards for everyone on your server. The home page (`/`) is a game menu showing today's progress in each game, and every game shares the same themes, player name, and leaderboard backend.
 
+## Play against your family and friends
+
+The big difference from the NYT games: **everyone on your server plays the same daily puzzles and lands on the same leaderboard.** Challenge your spouse, kids, or friends, compare today's results, and see who's ahead over weeks of streaks, win rates, average guesses, and best times. Each game has its own board, with a **Today** view and an **All-time** view.
+
+<p align="center">
+  <img src="docs/screenshots/leaderboard-ocean.png" alt="Wordly all-time leaderboard in the Ocean theme" width="260">
+  <img src="docs/screenshots/bee-lb-synthwave.png" alt="Spelly Bee daily leaderboard in the Synthwave theme" width="260">
+  <img src="docs/screenshots/connecty-lb-forest.png" alt="Connecty daily leaderboard in the Forest theme" width="260">
+</p>
+
+Pick a name on any device and you're in; there are no accounts or sign-ups.
+
+## Screenshots
+
+A few of the themes: Forest, Bubblegum 3D, Synthwave and Ocean. Pick yours with the theme button (◑) on the home menu; it applies to every game.
+
+<p align="center">
+  <img src="docs/screenshots/menu-forest.png" alt="Game menu in the Forest theme" width="190">
+  <img src="docs/screenshots/menu-bubblegum3d.png" alt="Game menu in the Bubblegum 3D theme" width="190">
+  <img src="docs/screenshots/wordly-synthwave.png" alt="Wordly game in the Synthwave theme" width="190">
+  <img src="docs/screenshots/bee-bubblegum3d.png" alt="Spelly Bee in the Bubblegum 3D theme" width="190">
+  <img src="docs/screenshots/connecty-ocean.png" alt="Connecty in the Ocean theme" width="190">
+</p>
+
+<sub>Leaderboard screenshots use sample players and scores.</sub>
+
 ## Games
 
 ### Wordly (`/wordly`)
