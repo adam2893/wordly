@@ -2,7 +2,7 @@
 
 <img src="icon.png" alt="Wordly icon" width="96" align="right">
 
-A small, self-hosted collection of daily word games: **Wordly** (guess the 5 or 6 letter word), **Spelly Bee**, **Boxy Letters**, and **Connecty**. Mobile-friendly, no accounts, shared leaderboards for everyone on your server. The home page (`/`) is a game menu showing today's progress in each game, and every game shares the same themes, player name, and leaderboard backend.
+A small, self-hosted collection of daily word games: **Wordly** (guess the 5 or 6 letter word), **Spelly Bee**, **Boxy Letters**, **Connecty**, **Mini Crossy**, and **Crossy**. Mobile-friendly, no accounts, shared leaderboards for everyone on your server. The home page (`/`) is a game menu showing today's progress in each game, and every game shares the same themes, player name, and leaderboard backend.
 
 ## Play against your family and friends
 
@@ -67,6 +67,14 @@ A few of the themes: Forest, Bubblegum 3D, Synthwave and Ocean. Pick yours with 
 - **Red herrings, but one answer**: words regularly fit a second group on the board, but every puzzle is checked at build time to have exactly one way to sort all 16 (see Dictionary below).
 - **Daily** puzzle shared by everyone (numbered from #1 on 2026-11-02), **Practice** plays any puzzle from the archive, **Yesterday's answers**, active-play timer, and a copyable emoji result grid.
 - **Leaderboard**: *Today* (solved, mistakes, time) and *All-time* (played, win %, perfect games, average mistakes, best time, streaks). First finished game of the day counts.
+
+### Mini Crossy (`/mini`) & Crossy (`/crossword`)
+
+- **Mini Crossy** is a bite-sized 5×5 daily crossword; **Crossy** is a full-sized daily crossword, both sourced from community puzzles on [Crosshare](https://crosshare.org) with constructor credit in the byline.
+- Tap a square to select it, tap again (or tap the clue bar / press `Space`) to switch between **Across** and **Down**, and use `‹` / `›` (or `Tab` / `Enter`) to jump between clues. Desktop viewports also show side-by-side Across and Down clue lists.
+- Optional **Check word**, **Reveal letter**, and **Reveal word** buttons if you get stuck — solving with 0 hints earns a **Flawless ★** badge on the leaderboard.
+- **Daily** + **Practice** modes, **Yesterday's answers**, active-play timer, and a copyable emoji share grid for minis.
+- **Leaderboard**: *Today* (time, hints — fewest hints wins, time breaks ties) and *All-time* (solved, flawless ★ solves, best time, average time, streaks). First solve of the day counts.
 
 ### Shared
 
@@ -186,7 +194,7 @@ Every push to `main` publishes `ghcr.io/jakeshake/wordly:latest`. Release tags (
 
 ## Credits
 
-- Word data: [ENABLE](https://github.com/dolph/dictionary) (public domain), [wordfreq](https://github.com/rspeer/wordfreq), [SCOWL](http://wordlist.aspell.net/), [lemminflect](https://github.com/bjascob/LemmInflect), and the [LDNOOBW](https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words) list.
+- Word data: [ENABLE](https://github.com/dolph/dictionary) (public domain), [wordfreq](https://github.com/rspeer/wordfreq), [SCOWL](http://wordlist.aspell.net/), [lemminflect](https://github.com/bjascob/LemmInflect), the [LDNOOBW](https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words) list, and crossword puzzles from [Crosshare](https://crosshare.org).
 - Several theme backgrounds are wallpapers collected from the web. If you own one of them and want it credited or removed, please [open an issue](https://github.com/jakeshake/wordly/issues) and it will be taken care of promptly.
 - Wordly is an independent project and is not affiliated with or endorsed by The New York Times.
 

@@ -82,6 +82,34 @@
     </span>
   </a>
 
+  <a class="game-card" href="/mini">
+    <span class="game-icon icon-mini" aria-hidden="true">
+      <span class="sq blk"></span><span class="sq hi">M</span><span class="sq hi">I</span>
+      <span class="sq">N</span><span class="sq">I</span><span class="sq">S</span>
+      <span class="sq">O</span><span class="sq">N</span><span class="sq blk"></span>
+    </span>
+    <span class="game-info">
+      <span class="game-name">Mini Crossy</span>
+      <span class="game-desc">Solve the bite-sized 5&times;5 daily crossword.</span>
+      <span id="status-mini" class="game-status"></span>
+    </span>
+  </a>
+
+  <a class="game-card" href="/crossword">
+    <span class="game-icon icon-crossword" aria-hidden="true">
+      <span class="sq"></span><span class="sq"></span><span class="sq blk"></span><span class="sq"></span><span class="sq"></span>
+      <span class="sq hi"></span><span class="sq hi"></span><span class="sq hi"></span><span class="sq hi"></span><span class="sq hi"></span>
+      <span class="sq"></span><span class="sq blk"></span><span class="sq"></span><span class="sq blk"></span><span class="sq"></span>
+      <span class="sq"></span><span class="sq"></span><span class="sq"></span><span class="sq"></span><span class="sq"></span>
+      <span class="sq"></span><span class="sq"></span><span class="sq blk"></span><span class="sq"></span><span class="sq"></span>
+    </span>
+    <span class="game-info">
+      <span class="game-name">Crossy</span>
+      <span class="game-desc">Tackle the full-sized daily crossword.</span>
+      <span id="status-crossword" class="game-status"></span>
+    </span>
+  </a>
+
   <p class="menu-foot">New daily puzzles every midnight · each game has its own leaderboard &#127942;</p>
 </main>
 
@@ -143,6 +171,32 @@
     set("status-connections", `Today: in progress · ${(conn.solved || []).length}/4 groups`, true);
   } else {
     set("status-connections", "Today's puzzle is waiting");
+  }
+
+  const mini = S.load(`mini:daily:${today}`);
+  if (mini && mini.over) {
+    set(
+      "status-mini",
+      `Today: ✓ solved in ${S.formatTimer(mini.activeMs || 0)}${mini.hints ? ` · ${mini.hints} hint${mini.hints === 1 ? "" : "s"}` : " ★"}`,
+      true
+    );
+  } else if (mini && mini.started) {
+    set("status-mini", `Today: in progress · ${mini.filled || 0}/${mini.total || 25}`, true);
+  } else {
+    set("status-mini", "Today's mini is waiting");
+  }
+
+  const cw = S.load(`crossword:daily:${today}`);
+  if (cw && cw.over) {
+    set(
+      "status-crossword",
+      `Today: ✓ solved in ${S.formatTimer(cw.activeMs || 0)}${cw.hints ? ` · ${cw.hints} hint${cw.hints === 1 ? "" : "s"}` : " ★"}`,
+      true
+    );
+  } else if (cw && cw.started) {
+    set("status-crossword", `Today: in progress · ${cw.filled || 0}/${cw.total || ""}`, true);
+  } else {
+    set("status-crossword", "Today's crossword is waiting");
   }
 
   greet();

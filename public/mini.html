@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#121213">
+<title>Mini Crossy — Wordly</title>
+<script>try{var t=localStorage.getItem("wordly:theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="games.css">
+</head>
+<body class="game-crossword game-mini">
+<div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+<header class="app-header">
+  <div class="header-row title-row">
+    <div class="header-side">
+      <a href="/" class="icon-btn" aria-label="All games" title="All games">&#8962;</a>
+      <button id="help-btn" class="icon-btn" aria-label="How to play" title="How to play">?</button>
+    </div>
+    <h1 class="app-title">MINI CROSSY</h1>
+    <div class="header-side header-side-end">
+      <button id="player-btn" class="icon-btn" aria-label="Player profile" title="Player profile">&#128100;</button>
+    </div>
+  </div>
+
+  <div class="header-row controls-row">
+    <div class="mode-toggle" role="group" aria-label="Game mode">
+      <button class="mode-btn active" data-mode="daily">Daily</button>
+      <button class="mode-btn" data-mode="practice">Practice</button>
+    </div>
+    <button id="theme-btn" class="icon-btn" aria-label="Change theme" title="Change theme">&#9681;</button>
+    <button id="leaderboard-btn" class="icon-btn" aria-label="Leaderboard" title="Leaderboard">&#127942;</button>
+    <button id="new-game-btn" class="icon-btn" aria-label="New puzzle" title="New puzzle">&#8635;</button>
+  </div>
+</header>
+
+<main class="game-main cw-main">
+  <div id="name-gate" class="name-gate hidden">
+    <h2>Who's playing?</h2>
+    <p>Pick a name so today's result counts on the leaderboard.</p>
+    <input id="gate-name-input" class="text-input" type="text" maxlength="40" placeholder="Your name" autocomplete="off" />
+    <button id="gate-name-btn" class="primary-btn">Start Daily Puzzle</button>
+  </div>
+
+  <div id="cw-game" class="cw-game hidden">
+    <div class="cw-top">
+      <span id="cw-byline" class="cw-byline"></span>
+      <span id="cw-timer" class="daily-timer hidden">0:00</span>
+    </div>
+
+    <div class="cw-layout">
+      <div class="cw-board-col">
+        <div id="cw-board" class="cw-board" role="grid" aria-label="Crossword grid"></div>
+
+        <div class="cw-clue-nav">
+          <button id="cw-clue-prev" class="cw-nav-btn" aria-label="Previous clue">&#8249;</button>
+          <button id="cw-clue-bar" class="cw-clue-bar" type="button" title="Tap to switch Across / Down">
+            <span id="cw-clue-num" class="cw-clue-badge">1A</span>
+            <span id="cw-clue-text" class="cw-clue-text"></span>
+          </button>
+          <button id="cw-clue-next" class="cw-nav-btn" aria-label="Next clue">&#8250;</button>
+        </div>
+
+        <div class="bee-controls cw-controls">
+          <button id="cw-check" class="pill-btn">Check word</button>
+          <button id="cw-reveal-cell" class="pill-btn">Reveal letter</button>
+          <button id="cw-reveal-word" class="pill-btn">Reveal word</button>
+        </div>
+
+        <button id="cw-extra" class="link-btn">Yesterday's answers</button>
+      </div>
+
+      <div class="cw-clues-panel">
+        <div class="cw-clue-col">
+          <h3>Across</h3>
+          <ul id="cw-across-list" class="cw-clue-list"></ul>
+        </div>
+        <div class="cw-clue-col">
+          <h3>Down</h3>
+          <ul id="cw-down-list" class="cw-clue-list"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="keyboard-wrap">
+  <div id="keyboard" class="keyboard"></div>
+</footer>
+
+<!-- How to play -->
+<div id="help-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <button class="modal-close" data-close="help-modal" aria-label="Close">&times;</button>
+    <h2>How to Play</h2>
+    <p>Fill every white square in the 5&times;5 mini crossword grid.</p>
+    <ul class="help-list">
+      <li>Tap a square to select it. Tap the active square (or the clue bar) to switch between <strong>Across</strong> and <strong>Down</strong>.</li>
+      <li>Use <strong>&lsaquo;</strong> and <strong>&rsaquo;</strong> to jump between clues.</li>
+      <li><strong>Check word</strong>, <strong>Reveal letter</strong>, and <strong>Reveal word</strong> are there if you get stuck — solving with 0 hints earns a <strong>Flawless &#9733;</strong> badge on the leaderboard.</li>
+    </ul>
+    <p><strong>Daily</strong> gives everyone the same puzzle, resetting at midnight, and counts on the leaderboard: fewest hints wins, and fastest time breaks ties. The clock only runs while the page is open. <strong>Practice</strong> gives you any puzzle from the archive.</p>
+    <p class="help-keys">Keyboard: <kbd>Arrows</kbd> move, <kbd>Space</kbd> flips direction, <kbd>Tab</kbd> / <kbd>Enter</kbd> next clue.</p>
+  </div>
+</div>
+
+<!-- Answers (yesterday / reveal) -->
+<div id="answers-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <button class="modal-close" data-close="answers-modal" aria-label="Close">&times;</button>
+    <h2 id="answers-title">Yesterday's Answers</h2>
+    <p id="answers-byline" class="answers-summary"></p>
+    <div id="answers-grid" class="cw-board cw-answers-board"></div>
+    <p id="answers-yours" class="answers-summary"></p>
+  </div>
+</div>
+
+<!-- Leaderboard -->
+<div id="leaderboard-modal" class="modal-overlay hidden">
+  <div class="modal modal-wide">
+    <button class="modal-close" data-close="leaderboard-modal" aria-label="Close">&times;</button>
+    <h2>Mini Crossy Leaderboard</h2>
+    <div class="leaderboard-tabs" role="group" aria-label="Leaderboard view">
+      <button class="lb-tab active" data-lb-view="today">Today</button>
+      <button class="lb-tab" data-lb-view="all">All-time</button>
+    </div>
+    <div id="leaderboard-content" class="leaderboard-content">
+      <p class="lb-status">Loading…</p>
+    </div>
+  </div>
+</div>
+
+<!-- Result -->
+<div id="result-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <button class="modal-close" data-close="result-modal" aria-label="Close">&times;</button>
+    <h2 id="result-title">Flawless! &#9733;</h2>
+    <p id="result-number" class="answers-summary"></p>
+    <div id="result-stats" class="result-stats"></div>
+    <button id="share-btn" class="primary-btn">Copy results</button>
+    <p id="result-countdown" class="result-countdown hidden"></p>
+    <button id="play-again-btn" class="primary-btn hidden">New Puzzle</button>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script src="words-mini.js"></script>
+<script>
+window.CROSSWORD_CONFIG = {
+  key: "mini",
+  name: "Mini Crossy",
+  epoch: MINI_EPOCH,
+  puzzles: MINI_PUZZLES,
+};
+</script>
+<script src="crossword.js"></script>
+</body>
+</html>

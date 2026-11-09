@@ -70,6 +70,8 @@ const wordlyStore = createStore("scores.json");
 const beeStore = createStore("bee.json");
 const boxedStore = createStore("boxed.json");
 const connectionsStore = createStore("connections.json");
+const miniStore = createStore("mini.json");
+const crosswordStore = createStore("crossword.json");
 
 // ---------- shared helpers ----------
 
@@ -397,6 +399,54 @@ function submitConnectionsScore(body) {
   return connectionsStore.write(records).then(() => record);
 }
 
+// ---------- Crosswords (Mini & Standard) ----------
+
+function computeCrosswordLeaderboard(store, date) {
+  const records = store.read();
+
+  const today = records
+    .filter((r) => r.date === date)
+    .map((r) => ({ name: r.name, hints: r.hints || 0, timeMs: r.timeMs }))
+    .sort((a, b) => a.hints - b.hints || (a.timeMs ?? Infinity) - (b.timeMs ?? Infinity) || a.name.localeCompare(b.name));
+
+  const overall = [];
+  for (const [name, games] of groupByPlayer(records)) {
+    const clean = games.filter((g) => (g.hints || 0) === 0);
+    overall.push({
+      name,
+      solved: games.length,
+      clean: clean.length,
+      avgTimeMs: average(games.filter((g) => Number.isFinite(g.timeMs)).map((g) => g.timeMs)),
+      bestTimeMs: minOrNull(clean.filter((g) => Number.isFinite(g.timeMs)).map((g) => g.timeMs)) ??
+        minOrNull(games.filter((g) => Number.isFinite(g.timeMs)).map((g) => g.timeMs)),
+      ...streaks(games, () => true),
+    });
+  }
+  overall.sort(
+    (a, b) =>
+      b.solved - a.solved ||
+      b.clean - a.clean ||
+      (a.bestTimeMs ?? Infinity) - (b.bestTimeMs ?? Infinity) ||
+      a.name.localeCompare(b.name)
+  );
+  return { today, overall };
+}
+
+function submitCrosswordScore(store, body) {
+  const name = validName(body.name);
+  const date = validDate(body.date);
+  const hints = intInRange(body.hints ?? 0, 0, 500, "hints");
+  const timeMs = optionalMs(body.timeMs, "timeMs");
+
+  const records = store.read();
+  const existing = records.find((r) => r.name === name && r.date === date);
+  // First solve of the day is the one that counts.
+  if (existing) return Promise.resolve(existing);
+  const record = { name, date, hints, timeMs, submittedAt: new Date().toISOString() };
+  records.push(record);
+  return store.write(records).then(() => record);
+}
+
 // ---------- rate limiting ----------
 
 // Fixed-window counters per client IP. Writes are the thing worth
@@ -590,6 +640,24 @@ const ROUTES = {
   "POST /api/connections/score": {
     limit: "write",
     handler: async (url, req) => submitConnectionsScore(await readJSONBody(req)),
+  },
+
+  "GET /api/mini/leaderboard": {
+    limit: "read",
+    handler: (url) => computeCrosswordLeaderboard(miniStore, validDate(url.searchParams.get("date"))),
+  },
+  "POST /api/mini/score": {
+    limit: "write",
+    handler: async (url, req) => submitCrosswordScore(miniStore, await readJSONBody(req)),
+  },
+
+  "GET /api/crossword/leaderboard": {
+    limit: "read",
+    handler: (url) => computeCrosswordLeaderboard(crosswordStore, validDate(url.searchParams.get("date"))),
+  },
+  "POST /api/crossword/score": {
+    limit: "write",
+    handler: async (url, req) => submitCrosswordScore(crosswordStore, await readJSONBody(req)),
   },
 };
 
