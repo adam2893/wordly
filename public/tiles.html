@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#121213">
+<title>Tiley — Wordly</title>
+<script>try{var t=localStorage.getItem("wordly:theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="games.css">
+</head>
+<body class="game-tiles">
+<div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+<header class="app-header">
+  <div class="header-row title-row">
+    <div class="header-side">
+      <a href="/" class="icon-btn" aria-label="All games" title="All games">&#8962;</a>
+      <button id="help-btn" class="icon-btn" aria-label="How to play" title="How to play">?</button>
+    </div>
+    <h1 class="app-title">TILEY</h1>
+    <div class="header-side header-side-end">
+      <button id="player-btn" class="icon-btn" aria-label="Player profile" title="Player profile">&#128100;</button>
+    </div>
+  </div>
+
+  <div class="header-row controls-row">
+    <div class="mode-toggle" role="group" aria-label="Game mode">
+      <button class="mode-btn active" data-mode="daily">Daily</button>
+      <button class="mode-btn" data-mode="practice">Practice</button>
+    </div>
+    <button id="theme-btn" class="icon-btn" aria-label="Change theme" title="Change theme">&#9681;</button>
+    <button id="leaderboard-btn" class="icon-btn" aria-label="Leaderboard" title="Leaderboard">&#127942;</button>
+    <button id="new-game-btn" class="icon-btn" aria-label="New puzzle" title="New puzzle">&#8635;</button>
+  </div>
+</header>
+
+<main class="game-main tiles-main">
+  <div id="name-gate" class="name-gate hidden">
+    <h2>Who's playing?</h2>
+    <p>Pick a name so today's result counts on the leaderboard.</p>
+    <input id="gate-name-input" class="text-input" type="text" maxlength="40" placeholder="Your name" autocomplete="off" />
+    <button id="gate-name-btn" class="primary-btn">Start Daily Puzzle</button>
+  </div>
+
+  <div id="tiles-game" class="tiles-game hidden">
+    <div class="tiles-top">
+      <div class="tiles-hud">
+        <div class="tiles-stat">
+          <span class="tiles-stat-label">Combo</span>
+          <output id="tiles-combo" class="tiles-stat-val">0</output>
+        </div>
+        <div class="tiles-stat">
+          <span class="tiles-stat-label">Best</span>
+          <output id="tiles-best" class="tiles-stat-val">0</output>
+        </div>
+        <div class="tiles-stat">
+          <span class="tiles-stat-label">Max</span>
+          <output id="tiles-max" class="tiles-stat-val">45</output>
+        </div>
+      </div>
+      <span id="tiles-timer" class="daily-timer hidden">0:00</span>
+    </div>
+
+    <div id="tiles-board" class="tiles-board" role="group" aria-label="Tiles board"></div>
+
+    <div class="bee-controls tiles-controls">
+      <button id="tiles-reset" class="pill-btn">Restart board</button>
+    </div>
+  </div>
+</main>
+
+<!-- How to play -->
+<div id="help-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <button class="modal-close" data-close="help-modal" aria-label="Close">&times;</button>
+    <h2>How to Play</h2>
+    <p>Match overlapping visual layers across tiles until the entire 5&times;6 board is cleared.</p>
+    <ul class="help-list">
+      <li>Each tile has up to <strong>3 layers</strong> (outer shape, middle motif, inner center).</li>
+      <li>Tap a tile, then tap a second tile that shares <strong>at least one matching layer</strong>.</li>
+      <li>Every shared layer disappears from both tiles, and your <strong>Combo</strong> increases by 1.</li>
+      <li>The second tile stays selected so you can chain matches into a continuous run!</li>
+      <li>If your selected tile becomes completely empty, you can hop to <strong>any tile on the board</strong> without breaking your combo.</li>
+    </ul>
+    <p>Clear all 30 tiles with 0 misses to achieve a <strong>Perfect 45/45</strong> combo!</p>
+    <p><strong>Daily</strong> gives everyone the same seeded board and motif palette each day, resetting at midnight. Catch up on missed days anytime with the calendar button (&#128197;).</p>
+  </div>
+</div>
+
+<!-- Leaderboard -->
+<div id="leaderboard-modal" class="modal-overlay hidden">
+  <div class="modal modal-wide">
+    <button class="modal-close" data-close="leaderboard-modal" aria-label="Close">&times;</button>
+    <h2>Tiley Leaderboard</h2>
+    <div class="leaderboard-tabs" role="group" aria-label="Leaderboard view">
+      <button class="lb-tab active" data-lb-view="today">Today</button>
+      <button class="lb-tab" data-lb-view="all">All-time</button>
+    </div>
+    <div id="leaderboard-content" class="leaderboard-content">
+      <p class="lb-status">Loading…</p>
+    </div>
+  </div>
+</div>
+
+<!-- Result -->
+<div id="result-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <button class="modal-close" data-close="result-modal" aria-label="Close">&times;</button>
+    <h2 id="result-title">Perfect! &#9733;</h2>
+    <p id="result-text" class="answers-summary"></p>
+    <div id="result-stats" class="result-stats"></div>
+    <button id="share-btn" class="primary-btn">Copy results</button>
+    <p id="result-countdown" class="result-countdown hidden"></p>
+    <button id="play-again-btn" class="primary-btn hidden">New Puzzle</button>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script src="tiles.js"></script>
+</body>
+</html>

@@ -85,11 +85,12 @@
 
   // ---------- game lifecycle ----------
 
-  function startDaily(length) {
-    const date = todayDateString();
+  function startDaily(length, dateStr) {
+    const date = dateStr || (state && state.date) || todayDateString();
     state = { mode: "daily", length, date };
     localStorage.setItem(STORAGE_KEYS.length, String(length));
     localStorage.setItem(STORAGE_KEYS.mode, "daily");
+    if (archiveCtrl) archiveCtrl.setDate(date);
     syncHeaderButtons();
 
     const name = getPlayerName();
@@ -159,8 +160,8 @@
     syncHeaderButtons();
   }
 
-  function startGame(mode, length) {
-    if (mode === "daily") startDaily(length);
+  function startGame(mode, length, dateStr) {
+    if (mode === "daily") startDaily(length, dateStr);
     else startPractice(length);
   }
 
@@ -609,11 +610,24 @@
   });
 
   // ---- Shell (theme, player name, modals) ----
+  let archiveCtrl = null;
   Shared.initShell({
     onNameSaved() {
       if (state && state.mode === "daily" && !nameGateEl.classList.contains("hidden")) {
-        startDaily(state.length);
+        startDaily(state.length, state.date);
       }
+    },
+  });
+  archiveCtrl = Shared.initArchive({
+    getStatus(d) {
+      const len = state ? state.length : 5;
+      const s = loadDailyState(len, d);
+      if (!s || !s.guesses || !s.guesses.length) return { state: "none", detail: d };
+      if (!s.over) return { state: "progress", detail: `${s.guesses.length} guess${s.guesses.length === 1 ? "" : "es"}` };
+      return { state: s.won ? "won" : "lost", detail: s.won ? `Solved in ${s.guesses.length}` : "Missed" };
+    },
+    onSelectDate(d) {
+      startDaily(state ? state.length : 5, d);
     },
   });
   Shared.onModalClose("result-modal", stopCountdown);

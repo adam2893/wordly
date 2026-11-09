@@ -2,7 +2,7 @@
 
 <img src="icon.png" alt="Wordly icon" width="96" align="right">
 
-A small, self-hosted collection of daily word games: **Wordly** (guess the 5 or 6 letter word), **Spelly Bee**, **Boxy Letters**, **Connecty**, **Mini Crossy**, and **Crossy**. Mobile-friendly, no accounts, shared leaderboards for everyone on your server. The home page (`/`) is a game menu showing today's progress in each game, and every game shares the same themes, player name, and leaderboard backend.
+A small, self-hosted collection of daily word and logic games: **Wordly** (guess the 5 or 6 letter word), **Spelly Bee**, **Boxy Letters**, **Connecty**, **Mini Crossy**, **Crossy**, **Tiley**, and **Sudoky**. Mobile-friendly, no accounts, shared leaderboards for everyone on your server, plus a **Daily Archive** (📅) to catch up on any past day you missed. The home page (`/`) is a game menu showing today's progress in each game, and every game shares the same themes, player name, and leaderboard backend.
 
 ## Play against your family and friends
 
@@ -76,8 +76,24 @@ A few of the themes: Forest, Bubblegum 3D, Synthwave and Ocean. Pick yours with 
 - **Daily** + **Practice** modes, **Yesterday's answers**, active-play timer, and a copyable emoji share grid for minis.
 - **Leaderboard**: *Today* (time, hints — fewest hints wins, time breaks ties) and *All-time* (solved, flawless ★ solves, best time, average time, streaks). First solve of the day counts.
 
+### Tiley (`/tiles`)
+
+- Clear the 5×6 board of 30 layered pattern tiles (ported from [baldoalessandro/tiles_game](https://github.com/baldoalessandro/tiles_game)). Each tile holds up to 3 overlapping layers (outer shape, middle motif, inner center).
+- Tap a tile, then tap a second tile that shares at least one matching layer — shared layers vanish from both tiles and your **Combo** increases by 1. When your active tile empties completely, you get a free hop to any tile on the board without breaking your combo.
+- Clear all 30 tiles with 0 misses to achieve a **Perfect 45/45 ★** combo!
+- **Daily** board and motif palette (Squircle Pebbles, Azulejo Diamonds, Bauhaus Rings, Origami Petals) shared by everyone, plus **Practice** mode, **Daily Archive** (📅), and active-play timer.
+- **Leaderboard**: *Today* (best combo, misses, time) and *All-time* (boards cleared, perfect ★ games, average combo, best time, streaks).
+
+### Sudoky (`/sudoku`)
+
+- Daily & Practice **Easy**, **Medium**, and **Hard** 9×9 Sudoku puzzles (puzzle bank from [TN1ck/super-sudoku](https://github.com/TN1ck/super-sudoku), pre-solved via `tools/build_sudoku.py`).
+- **Notes (Pencil marks)** mode (`N` key) for 1–9 candidate numbers inside empty cells — placing a digit automatically clears matching notes in the same row, column, and 3×3 box.
+- Row/column/box peer highlighting, same-digit highlighting, real-time conflict highlighting, **Undo** (`U`), **Erase**, **Hint**, and remaining-count badges on each number button.
+- **Leaderboard**: separate **Easy**, **Medium**, and **Hard** tabs with *Today* (time, mistakes, hints) and *All-time* (solved, flawless ★ solves, best time, average time, streaks).
+
 ### Shared
 
+- **Daily Archive (📅)** — missed a day? Tap the calendar button in any game's header to browse and play the past 30 days of daily puzzles, complete with completion badges (`✓`, `✗`, `•••`) and leaderboard submission.
 - **19 themes** — Dark, Light, Standard Neon, Neon City, Synthwave, Bubblegum 3D, Ocean, Sunset, Forest, Halloween, Christmas, Neon 80s, Spooky, Retro Terminal, Bubblegum, Art Deco, Tropical, Desert, Dessert — picked from the palette button on any page, saved across visits and games.
 - **Player name** (no password) set once, used by every game's leaderboard.
 
@@ -194,7 +210,7 @@ Every push to `main` publishes `ghcr.io/jakeshake/wordly:latest`. Release tags (
 
 ## Credits
 
-- Word data: [ENABLE](https://github.com/dolph/dictionary) (public domain), [wordfreq](https://github.com/rspeer/wordfreq), [SCOWL](http://wordlist.aspell.net/), [lemminflect](https://github.com/bjascob/LemmInflect), the [LDNOOBW](https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words) list, and crossword puzzles from [Crosshare](https://crosshare.org).
+- Word data: [ENABLE](https://github.com/dolph/dictionary) (public domain), [wordfreq](https://github.com/rspeer/wordfreq), [SCOWL](http://wordlist.aspell.net/), [lemminflect](https://github.com/bjascob/LemmInflect), the [LDNOOBW](https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words) list, crossword puzzles from [Crosshare](https://crosshare.org), Tiles mechanics from [baldoalessandro/tiles_game](https://github.com/baldoalessandro/tiles_game), and Sudoku puzzles from [TN1ck/super-sudoku](https://github.com/TN1ck/super-sudoku).
 - Several theme backgrounds are wallpapers collected from the web. If you own one of them and want it credited or removed, please [open an issue](https://github.com/jakeshake/wordly/issues) and it will be taken care of promptly.
 - Wordly is an independent project and is not affiliated with or endorsed by The New York Times.
 

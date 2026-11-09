@@ -72,6 +72,114 @@ window.Shared = (() => {
     return `Next ${noun} in ${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}m`;
   }
 
+  function formatDateLabel(dateStr) {
+    if (dateStr === todayDateString()) return "Today";
+    if (dateStr === shiftDate(todayDateString(), -1)) return "Yesterday";
+    const [y, m, d] = dateStr.split("-").map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  }
+
+  // Archive modal so players can catch up on missed daily puzzles.
+  // getStatus(dateStr) -> { state: "won" | "lost" | "progress" | "none", detail?: string }
+  function initArchive({ activeDate, getStatus, onSelectDate, days = 30, epoch = "2026-11-02" } = {}) {
+    const controlsRow = document.querySelector(".controls-row");
+    let archiveBtn = document.getElementById("archive-btn");
+    if (controlsRow && !archiveBtn) {
+      archiveBtn = document.createElement("button");
+      archiveBtn.id = "archive-btn";
+      archiveBtn.className = "icon-btn archive-btn";
+      archiveBtn.type = "button";
+      archiveBtn.setAttribute("aria-label", "Past daily puzzles");
+      archiveBtn.title = "Past daily puzzles";
+      archiveBtn.innerHTML = "&#128197;";
+      const lbBtn = document.getElementById("leaderboard-btn");
+      if (lbBtn) controlsRow.insertBefore(archiveBtn, lbBtn);
+      else controlsRow.appendChild(archiveBtn);
+    }
+
+    if (!document.getElementById("archive-modal")) {
+      document.body.insertAdjacentHTML(
+        "beforeend",
+        `<div id="archive-modal" class="modal-overlay hidden">
+          <div class="modal modal-wide">
+            <button class="modal-close" data-close="archive-modal" aria-label="Close">&times;</button>
+            <h2>Daily Archive</h2>
+            <p class="archive-sub">Catch up on any daily puzzle you missed.</p>
+            <div id="archive-list" class="archive-grid"></div>
+          </div>
+        </div>`
+      );
+      document
+        .querySelector('[data-close="archive-modal"]')
+        .addEventListener("click", () => closeModal("archive-modal"));
+      const overlay = document.getElementById("archive-modal");
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) closeModal("archive-modal");
+      });
+    }
+
+    let currentActive = activeDate || todayDateString();
+
+    function updateBadge(dateStr) {
+      currentActive = dateStr || todayDateString();
+      if (!archiveBtn) return;
+      const isPast = currentActive !== todayDateString();
+      archiveBtn.classList.toggle("is-past", isPast);
+      archiveBtn.title = isPast ? `Playing ${currentActive} (tap to switch day)` : "Past daily puzzles";
+      const dailyBtn = document.querySelector('.mode-btn[data-mode="daily"]');
+      if (dailyBtn) {
+        dailyBtn.textContent = isPast ? formatDateLabel(currentActive) : "Daily";
+      }
+    }
+
+    function renderArchive() {
+      const list = document.getElementById("archive-list");
+      if (!list) return;
+      const today = todayDateString();
+      const items = [];
+      for (let i = 0; i < days; i++) {
+        const d = shiftDate(today, -i);
+        if (epoch && d < epoch && i > 14) break;
+        const st = (getStatus && getStatus(d)) || { state: "none" };
+        const badge =
+          st.state === "won"
+            ? "✓"
+            : st.state === "lost"
+            ? "✗"
+            : st.state === "progress"
+            ? "•••"
+            : "Play";
+        items.push(`
+          <button type="button" class="archive-day st-${st.state}${d === currentActive ? " active" : ""}" data-date="${d}">
+            <span class="archive-day-top">
+              <span class="archive-day-label">${escapeHtml(formatDateLabel(d))}</span>
+              <span class="archive-day-badge">${escapeHtml(badge)}</span>
+            </span>
+            <span class="archive-day-meta">${escapeHtml(st.detail || d)}</span>
+          </button>`);
+      }
+      list.innerHTML = items.join("");
+      list.querySelectorAll(".archive-day").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const picked = btn.dataset.date;
+          updateBadge(picked);
+          closeModal("archive-modal");
+          if (onSelectDate) onSelectDate(picked);
+        });
+      });
+    }
+
+    if (archiveBtn) {
+      archiveBtn.addEventListener("click", () => {
+        renderArchive();
+        openModal("archive-modal");
+      });
+    }
+
+    updateBadge(currentActive);
+    return { setDate: updateBadge, refresh: renderArchive };
+  }
+
   function formatTimer(ms) {
     const totalSeconds = Math.max(0, Math.floor(ms / 1000));
     const h = Math.floor(totalSeconds / 3600);
@@ -394,6 +502,7 @@ window.Shared = (() => {
     shiftDate,
     msUntilNextMidnight,
     formatCountdown,
+    formatDateLabel,
     formatTimer,
     hashString,
     seededRandom,
@@ -411,6 +520,7 @@ window.Shared = (() => {
     anyModalOpen,
     applyTheme,
     initShell,
+    initArchive,
     wireNameGate,
     postJSON,
     getJSON,

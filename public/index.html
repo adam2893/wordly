@@ -110,7 +110,42 @@
     </span>
   </a>
 
-  <p class="menu-foot">New daily puzzles every midnight · each game has its own leaderboard &#127942;</p>
+  <a class="game-card" href="/tiles">
+    <span class="game-icon icon-tiles" aria-hidden="true">
+      <svg viewBox="0 0 100 100">
+        <rect x="8" y="8" width="40" height="40" rx="11" class="tl-outer"></rect>
+        <rect x="16" y="16" width="24" height="24" rx="7" class="tl-mid"></rect>
+        <circle cx="28" cy="28" r="6" class="tl-inner"></circle>
+        <rect x="52" y="8" width="40" height="40" rx="11" class="tl-mid"></rect>
+        <polygon points="72,16 84,28 72,40 60,28" class="tl-outer"></polygon>
+        <rect x="8" y="52" width="40" height="40" rx="11" class="tl-mid"></rect>
+        <circle cx="28" cy="72" r="12" class="tl-outer"></circle>
+        <rect x="52" y="52" width="40" height="40" rx="11" class="tl-outer"></rect>
+        <rect x="60" y="60" width="24" height="24" rx="7" class="tl-mid"></rect>
+        <circle cx="72" cy="72" r="6" class="tl-inner"></circle>
+      </svg>
+    </span>
+    <span class="game-info">
+      <span class="game-name">Tiley</span>
+      <span class="game-desc">Chain matching pattern layers to clear the board.</span>
+      <span id="status-tiles" class="game-status"></span>
+    </span>
+  </a>
+
+  <a class="game-card" href="/sudoku">
+    <span class="game-icon icon-sudoku" aria-hidden="true">
+      <span class="sq hi">9</span><span class="sq"></span><span class="sq">4</span>
+      <span class="sq"></span><span class="sq hi">5</span><span class="sq"></span>
+      <span class="sq">2</span><span class="sq"></span><span class="sq hi">1</span>
+    </span>
+    <span class="game-info">
+      <span class="game-name">Sudoky</span>
+      <span class="game-desc">Daily Easy, Medium &amp; Hard logic number grids.</span>
+      <span id="status-sudoku" class="game-status"></span>
+    </span>
+  </a>
+
+  <p class="menu-foot">New daily puzzles every midnight · play missed days anytime (&#128197;) · leaderboards &#127942;</p>
 </main>
 
 <script src="common.js"></script>
@@ -198,6 +233,37 @@
   } else {
     set("status-crossword", "Today's crossword is waiting");
   }
+
+  const tiles = S.load(`tiles:daily:${today}`);
+  if (tiles && tiles.over) {
+    set(
+      "status-tiles",
+      `Today: ✓ cleared · ${tiles.bestCombo || 0}/45 combo${tiles.errors === 0 && tiles.bestCombo >= 45 ? " ★" : ""}`,
+      true
+    );
+  } else if (tiles && tiles.started) {
+    set("status-tiles", `Today: in progress · ${tiles.cleared || 0}/30 cleared`, true);
+  } else {
+    set("status-tiles", "Today's tiles are waiting");
+  }
+
+  const sudokuSummary = [
+    ["easy", "Easy"],
+    ["medium", "Med"],
+    ["hard", "Hard"],
+  ]
+    .map(([diff, label]) => {
+      const s = S.load(`sudoku:daily:${diff}:${today}`);
+      if (!s || (!s.started && !s.over)) return null;
+      if (!s.over) return `${label} in progress`;
+      return `${label} ✓${!s.hints && !s.mistakes ? " ★" : ""}`;
+    })
+    .filter(Boolean);
+  set(
+    "status-sudoku",
+    sudokuSummary.length ? `Today: ${sudokuSummary.join(" · ")}` : "Today's grids are waiting",
+    sudokuSummary.length
+  );
 
   greet();
 })();

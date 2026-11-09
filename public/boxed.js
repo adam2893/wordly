@@ -163,10 +163,11 @@
     stopwatch = null;
   }
 
-  function startDaily() {
+  function startDaily(dateStr) {
     teardown();
     setMode("daily");
-    const date = S.todayDateString();
+    const date = dateStr || (state && state.date) || S.todayDateString();
+    if (archiveCtrl) archiveCtrl.setDate(date);
     if (!S.getPlayerName()) {
       state = { mode: "daily", date };
       showGate();
@@ -690,12 +691,24 @@
     if (state && state.mode === "practice") startPractice(true);
   });
 
+  let archiveCtrl = null;
   S.initShell({
     onNameSaved() {
-      if (state && state.mode === "daily" && !els.gate.classList.contains("hidden")) startDaily();
+      if (state && state.mode === "daily" && !els.gate.classList.contains("hidden")) startDaily(state.date);
     },
   });
-  S.wireNameGate(() => startDaily());
+  archiveCtrl = S.initArchive({
+    getStatus(d) {
+      const s = S.load(KEYS.daily(d));
+      if (!s || (!s.started && !s.solved)) return { state: "none", detail: d };
+      if (!s.solved) return { state: "progress", detail: "In progress" };
+      return { state: "won", detail: `Solved in ${(s.words || []).length} words` };
+    },
+    onSelectDate(d) {
+      startDaily(d);
+    },
+  });
+  S.wireNameGate(() => startDaily(state && state.date));
 
   let startMode = "daily";
   try {

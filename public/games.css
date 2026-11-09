@@ -1514,3 +1514,604 @@ kbd {
     font-size: 0.75rem;
   }
 }
+
+/* ---------- Daily Archive (Missed Days) ---------- */
+.archive-btn.is-past {
+  background: color-mix(in srgb, var(--color-accent) 22%, var(--color-surface));
+  box-shadow: 0 0 0 1.5px var(--color-accent);
+}
+
+.archive-sub {
+  margin: -0.35rem 0 0.85rem;
+  font-size: 0.85rem;
+  color: var(--color-text-dim);
+}
+
+.archive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+  gap: 0.55rem;
+  max-height: 58vh;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.archive-day {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.3rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.14s ease, box-shadow 0.14s ease;
+}
+
+.archive-day:hover,
+.archive-day:focus-visible {
+  border-color: var(--color-accent);
+}
+
+.archive-day.active {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1.5px var(--color-accent);
+}
+
+.archive-day-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+
+.archive-day-label {
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.archive-day-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.1rem 0.42rem;
+  border-radius: 999px;
+  background: var(--color-key-bg);
+  color: var(--color-key-text);
+}
+
+.archive-day.st-won .archive-day-badge {
+  background: var(--color-correct);
+  color: var(--key-text-on-color);
+}
+
+.archive-day.st-lost .archive-day-badge {
+  background: var(--color-absent);
+  color: var(--color-text);
+}
+
+.archive-day.st-progress .archive-day-badge {
+  background: var(--bee-center, var(--color-present));
+  color: var(--bee-center-text, var(--key-text-on-color));
+}
+
+.archive-day-meta {
+  font-size: 0.72rem;
+  color: var(--color-text-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Tiley (/tiles) ---------- */
+.icon-tiles svg {
+  width: 100%;
+  height: 100%;
+}
+
+.icon-tiles .tl-outer {
+  fill: var(--color-correct);
+  opacity: 0.88;
+}
+
+.icon-tiles .tl-mid {
+  fill: var(--bee-center, var(--color-present));
+}
+
+.icon-tiles .tl-inner {
+  fill: var(--color-accent);
+}
+
+.tiles-main {
+  justify-content: flex-start;
+  overflow-y: auto;
+}
+
+.tiles-game {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.tiles-top {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.tiles-hud {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.tiles-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.32rem;
+  padding: 0.26rem 0.6rem;
+  border-radius: 999px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.tiles-stat-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-dim);
+}
+
+.tiles-stat-val {
+  font-size: 0.92rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
+#tiles-combo {
+  color: var(--color-accent);
+}
+
+.tiles-board {
+  --tiles-w: min(92vw, 370px, calc((100dvh - 230px) * 5 / 6));
+  width: var(--tiles-w);
+  aspect-ratio: 5 / 6;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+  gap: 7px;
+  padding: 7px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.tiles-cell {
+  position: relative;
+  border-radius: 10px;
+  border: 2px solid var(--color-border);
+  background: var(--color-bg);
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.14s ease, box-shadow 0.14s ease, opacity 0.2s ease;
+}
+
+.tiles-cell svg {
+  width: 88%;
+  height: 88%;
+  display: block;
+}
+
+.tiles-cell.selected {
+  border-color: var(--bee-center, var(--color-present));
+  box-shadow: 0 0 0 2px var(--bee-center, var(--color-present)), 0 4px 12px rgba(0, 0, 0, 0.28);
+  transform: scale(1.04);
+  z-index: 2;
+}
+
+.tiles-cell.empty {
+  background: color-mix(in srgb, var(--color-bg) 45%, transparent);
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--color-border) 55%, transparent);
+  cursor: default;
+}
+
+.tiles-cell.selected-empty {
+  border-style: dashed;
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-bg));
+  box-shadow: 0 0 0 1.5px var(--color-accent);
+}
+
+.tiles-hop {
+  font-size: 0.56rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-accent);
+  text-align: center;
+  line-height: 1.1;
+  padding: 0 2px;
+}
+
+/* ---------- Sudoky (/sudoku) ---------- */
+.icon-sudoku {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 2px;
+  padding: 0.35rem;
+}
+
+.icon-sudoku .sq {
+  border-radius: 3px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+  font-size: 0.75rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-sudoku .sq.hi {
+  background: var(--color-correct);
+  color: var(--key-text-on-color);
+  border-color: transparent;
+}
+
+.sudoku-main {
+  justify-content: flex-start;
+  overflow-y: auto;
+}
+
+.sudoku-game {
+  width: 100%;
+  max-width: 430px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sudoku-top {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 1.35rem;
+}
+
+.sudoku-meta-label {
+  font-size: 0.84rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-dim);
+  text-shadow: 0 0 4px var(--color-bg), 0 0 8px var(--color-bg), 0 1px 2px var(--color-bg);
+}
+
+.sudoku-board {
+  --su-size: min(92vw, 378px, calc(100dvh - 310px));
+  width: var(--su-size);
+  height: var(--su-size);
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  grid-template-rows: repeat(9, minmax(0, 1fr));
+  background: var(--color-border-strong);
+  border: 2.5px solid var(--color-text);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.sudoku-cell {
+  position: relative;
+  border: none;
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-accent);
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.sudoku-cell:nth-child(9n) {
+  border-right: none;
+}
+
+.sudoku-cell:nth-child(n + 73) {
+  border-bottom: none;
+}
+
+.sudoku-cell.box-right {
+  border-right: 2.5px solid var(--color-text);
+}
+
+.sudoku-cell.box-bottom {
+  border-bottom: 2.5px solid var(--color-text);
+}
+
+.sudoku-cell.given {
+  color: var(--color-text);
+}
+
+.sudoku-cell.peer {
+  background: color-mix(in srgb, var(--color-text) 9%, var(--color-surface));
+}
+
+.sudoku-cell.same-digit {
+  background: color-mix(in srgb, var(--bee-center, var(--color-present)) 32%, var(--color-surface));
+}
+
+.sudoku-cell.selected {
+  background: var(--bee-center, var(--color-present));
+  color: var(--bee-center-text, var(--key-text-on-color));
+}
+
+.sudoku-cell.conflict {
+  background: color-mix(in srgb, var(--color-danger) 26%, var(--color-surface));
+  color: var(--color-danger);
+}
+
+.sudoku-cell.selected.conflict {
+  background: var(--color-danger);
+  color: #ffffff;
+}
+
+.sudoku-cell.solved {
+  background: color-mix(in srgb, var(--color-correct) 22%, var(--color-surface));
+}
+
+.sudoku-cell.hinted::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-style: solid;
+  border-width: 0 7px 7px 0;
+  border-color: transparent var(--color-accent) transparent transparent;
+}
+
+.sudoku-val {
+  font-size: clamp(1rem, 4.2vw, 1.38rem);
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.sudoku-notes {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  padding: 1px;
+  pointer-events: none;
+}
+
+.sudoku-notes span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(0.45rem, 1.6vw, 0.58rem);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.sudoku-notes span.hi {
+  color: var(--color-accent);
+  font-weight: 900;
+}
+
+.sudoku-cell.selected .sudoku-notes span {
+  color: var(--bee-center-text, var(--key-text-on-color));
+}
+
+.sudoku-tools {
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.sudoku-tools .pill-btn {
+  padding: 0.42rem 0.78rem;
+  min-width: 0;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+}
+
+.sudoku-tools .pill-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.sudoku-tools .pill-btn.active-tool {
+  background: var(--color-accent);
+  color: var(--color-on-accent, #fff);
+  border-color: var(--color-accent);
+}
+
+.notes-badge {
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 0.08rem 0.34rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.sudoku-numpad {
+  width: 100%;
+  max-width: 380px;
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.sudoku-num-btn {
+  height: 3.1rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-key-bg);
+  color: var(--color-key-text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 0;
+  cursor: pointer;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.sudoku-num-btn .num-main {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.sudoku-num-btn .num-rem {
+  font-size: 0.58rem;
+  font-weight: 700;
+  opacity: 0.72;
+  line-height: 1;
+}
+
+.sudoku-num-btn.active-digit {
+  border-color: var(--bee-center, var(--color-present));
+  box-shadow: 0 0 0 1.5px var(--bee-center, var(--color-present));
+}
+
+.sudoku-num-btn.completed {
+  opacity: 0.36;
+}
+
+.sudoku-lb-bars {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+   justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.sudoku-lb-bars .leaderboard-tabs {
+  margin-bottom: 0;
+}
+
+@media (max-height: 700px) {
+  .tiles-board {
+    --tiles-w: min(88vw, 330px, calc((100dvh - 210px) * 5 / 6));
+    gap: 5px;
+    padding: 5px;
+  }
+  .sudoku-board {
+    --su-size: min(90vw, 330px, calc(100dvh - 285px));
+  }
+  .sudoku-num-btn {
+    height: 2.65rem;
+  }
+}
+
+/* ---------- Craft & Typography Polish ---------- */
+.result-stat-value,
+.lb-table td,
+.cw-num,
+.result-countdown {
+  font-variant-numeric: tabular-nums;
+}
+
+.modal h2,
+.name-gate h2,
+.cw-clue-text,
+.menu-greeting,
+.menu-foot,
+.game-desc,
+.archive-sub {
+  text-wrap: balance;
+}
+
+.game-card {
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12), 0 8px 20px rgba(0, 0, 0, 0.14);
+}
+
+.modal {
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.38), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pill-btn,
+  .primary-btn,
+  .key,
+  .sudoku-num-btn,
+  .cw-nav-btn,
+  .icon-btn {
+    transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), filter 0.14s ease, background-color 0.14s ease;
+  }
+  .pill-btn:active:not(:disabled),
+  .primary-btn:active:not(:disabled),
+  .key:active,
+  .sudoku-num-btn:active,
+  .cw-nav-btn:active,
+  .archive-day:active {
+    transform: scale(0.96);
+  }
+}
+
+[data-theme="terminal"] .tiles-board,
+[data-theme="terminal"] .tiles-cell,
+[data-theme="terminal"] .sudoku-board,
+[data-theme="terminal"] .sudoku-num-btn,
+[data-theme="terminal"] .archive-day,
+[data-theme="art-deco"] .tiles-board,
+[data-theme="art-deco"] .tiles-cell,
+[data-theme="art-deco"] .sudoku-board,
+[data-theme="art-deco"] .sudoku-num-btn,
+[data-theme="art-deco"] .archive-day {
+  border-radius: 0;
+}
+
+[data-theme="bubblegum"] .tiles-board,
+[data-theme="bubblegum"] .sudoku-board,
+[data-theme="bubblegum"] .sudoku-num-btn,
+[data-theme="bubblegum"] .archive-day {
+  border: 2.5px solid #5a2a52;
+  box-shadow: 0 3px 0 #5a2a52;
+}

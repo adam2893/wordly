@@ -135,10 +135,11 @@
     stopwatch = null;
   }
 
-  function startDaily() {
+  function startDaily(dateStr) {
     teardown();
     setMode("daily");
-    const date = S.todayDateString();
+    const date = dateStr || (state && state.date) || S.todayDateString();
+    if (archiveCtrl) archiveCtrl.setDate(date);
     if (!S.getPlayerName()) {
       state = { mode: "daily", date };
       showGate();
@@ -888,12 +889,28 @@
 
   buildKeyboard();
 
+  let archiveCtrl = null;
   S.initShell({
     onNameSaved() {
-      if (state && state.mode === "daily" && !els.gate.classList.contains("hidden")) startDaily();
+      if (state && state.mode === "daily" && !els.gate.classList.contains("hidden")) startDaily(state.date);
     },
   });
-  S.wireNameGate(() => startDaily());
+  archiveCtrl = S.initArchive({
+    epoch: CFG.epoch,
+    getStatus(d) {
+      const s = S.load(KEYS.daily(d));
+      if (!s || (!s.started && !s.over)) return { state: "none", detail: d };
+      if (!s.over) return { state: "progress", detail: `${s.filled || 0}/${s.total || ""} filled` };
+      return {
+        state: "won",
+        detail: `${S.formatTimer(s.activeMs || 0)}${s.hints ? ` · ${s.hints} hint${s.hints === 1 ? "" : "s"}` : " ★"}`,
+      };
+    },
+    onSelectDate(d) {
+      startDaily(d);
+    },
+  });
+  S.wireNameGate(() => startDaily(state && state.date));
 
   let startMode = "daily";
   try {

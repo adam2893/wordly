@@ -164,10 +164,11 @@
     submitTimer = null;
   }
 
-  function startDaily() {
+  function startDaily(dateStr) {
     teardown();
     setMode("daily");
-    const date = S.todayDateString();
+    const date = dateStr || (state && state.date) || S.todayDateString();
+    if (archiveCtrl) archiveCtrl.setDate(date);
     if (!S.getPlayerName()) {
       state = { mode: "daily", date };
       showGate();
@@ -708,12 +709,27 @@
     if (state && state.mode === "practice") startPractice(true);
   });
 
+  let archiveCtrl = null;
   S.initShell({
     onNameSaved() {
-      if (state && state.mode === "daily" && !els.gate.classList.contains("hidden")) startDaily();
+      if (state && state.mode === "daily" && !els.gate.classList.contains("hidden")) startDaily(state.date);
     },
   });
-  S.wireNameGate(() => startDaily());
+  archiveCtrl = S.initArchive({
+    getStatus(d) {
+      const s = S.load(KEYS.daily(d));
+      if (!s || !s.found || !s.found.length) return { state: "none", detail: d };
+      const isGenius = s.maxScore && s.score >= Math.round(0.7 * s.maxScore);
+      return {
+        state: isGenius ? "won" : "progress",
+        detail: `${s.rank || "Played"} · ${s.score || 0} pts`,
+      };
+    },
+    onSelectDate(d) {
+      startDaily(d);
+    },
+  });
+  S.wireNameGate(() => startDaily(state && state.date));
 
   let startMode = "daily";
   try {

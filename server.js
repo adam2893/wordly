@@ -72,6 +72,8 @@ const boxedStore = createStore("boxed.json");
 const connectionsStore = createStore("connections.json");
 const miniStore = createStore("mini.json");
 const crosswordStore = createStore("crossword.json");
+const tilesStore = createStore("tiles.json");
+const sudokuStore = createStore("sudoku.json");
 
 // ---------- shared helpers ----------
 
@@ -447,6 +449,136 @@ function submitCrosswordScore(store, body) {
   return store.write(records).then(() => record);
 }
 
+// ---------- Tiley ----------
+
+function computeTilesLeaderboard(date) {
+  const records = tilesStore.read();
+
+  const today = records
+    .filter((r) => r.date === date)
+    .map((r) => ({
+      name: r.name,
+      bestCombo: r.bestCombo,
+      maxCombo: r.maxCombo || 45,
+      errors: r.errors || 0,
+      timeMs: r.timeMs,
+    }))
+    .sort(
+      (a, b) =>
+        b.bestCombo - a.bestCombo ||
+        a.errors - b.errors ||
+        (a.timeMs ?? Infinity) - (b.timeMs ?? Infinity) ||
+        a.name.localeCompare(b.name)
+    );
+
+  const overall = [];
+  for (const [name, games] of groupByPlayer(records)) {
+    const perfect = games.filter((g) => (g.errors || 0) === 0 && g.bestCombo >= (g.maxCombo || 45));
+    overall.push({
+      name,
+      solved: games.length,
+      perfect: perfect.length,
+      avgCombo: average(games.map((g) => g.bestCombo), 1),
+      bestTimeMs: minOrNull(games.filter((g) => Number.isFinite(g.timeMs)).map((g) => g.timeMs)),
+      ...streaks(games, () => true),
+    });
+  }
+  overall.sort(
+    (a, b) =>
+      b.solved - a.solved ||
+      b.perfect - a.perfect ||
+      (b.avgCombo ?? 0) - (a.avgCombo ?? 0) ||
+      (a.bestTimeMs ?? Infinity) - (b.bestTimeMs ?? Infinity) ||
+      a.name.localeCompare(b.name)
+  );
+  return { today, overall };
+}
+
+function submitTilesScore(body) {
+  const name = validName(body.name);
+  const date = validDate(body.date);
+  const maxCombo = intInRange(body.maxCombo ?? 45, 1, 200, "maxCombo");
+  const bestCombo = intInRange(body.bestCombo, 1, maxCombo, "bestCombo");
+  const errors = intInRange(body.errors ?? 0, 0, 500, "errors");
+  const timeMs = optionalMs(body.timeMs, "timeMs");
+
+  const records = tilesStore.read();
+  const existing = records.find((r) => r.name === name && r.date === date);
+  if (existing) return Promise.resolve(existing);
+  const record = { name, date, bestCombo, maxCombo, errors, timeMs, submittedAt: new Date().toISOString() };
+  records.push(record);
+  return tilesStore.write(records).then(() => record);
+}
+
+// ---------- Sudoky ----------
+
+const SUDOKU_DIFFS = new Set(["easy", "medium", "hard"]);
+
+function validSudokuDiff(diff) {
+  const d = typeof diff === "string" ? diff.toLowerCase() : "easy";
+  if (!SUDOKU_DIFFS.has(d)) throw new Error("invalid difficulty");
+  return d;
+}
+
+function computeSudokuLeaderboard(date, difficulty) {
+  const records = sudokuStore.read().filter((r) => (r.difficulty || "easy") === difficulty);
+
+  const today = records
+    .filter((r) => r.date === date)
+    .map((r) => ({
+      name: r.name,
+      mistakes: r.mistakes || 0,
+      hints: r.hints || 0,
+      timeMs: r.timeMs,
+    }))
+    .sort(
+      (a, b) =>
+        a.hints - b.hints ||
+        a.mistakes - b.mistakes ||
+        (a.timeMs ?? Infinity) - (b.timeMs ?? Infinity) ||
+        a.name.localeCompare(b.name)
+    );
+
+  const overall = [];
+  for (const [name, games] of groupByPlayer(records)) {
+    const flawless = games.filter((g) => (g.hints || 0) === 0 && (g.mistakes || 0) === 0);
+    overall.push({
+      name,
+      solved: games.length,
+      flawless: flawless.length,
+      avgTimeMs: average(games.filter((g) => Number.isFinite(g.timeMs)).map((g) => g.timeMs)),
+      bestTimeMs:
+        minOrNull(flawless.filter((g) => Number.isFinite(g.timeMs)).map((g) => g.timeMs)) ??
+        minOrNull(games.filter((g) => Number.isFinite(g.timeMs)).map((g) => g.timeMs)),
+      ...streaks(games, () => true),
+    });
+  }
+  overall.sort(
+    (a, b) =>
+      b.solved - a.solved ||
+      b.flawless - a.flawless ||
+      (a.bestTimeMs ?? Infinity) - (b.bestTimeMs ?? Infinity) ||
+      a.name.localeCompare(b.name)
+  );
+  return { today, overall };
+}
+
+function submitSudokuScore(body) {
+  const name = validName(body.name);
+  const date = validDate(body.date);
+  const difficulty = validSudokuDiff(body.difficulty);
+  const mistakes = intInRange(body.mistakes ?? 0, 0, 500, "mistakes");
+  const hints = intInRange(body.hints ?? 0, 0, 81, "hints");
+  const timeMs = optionalMs(body.timeMs, "timeMs");
+
+  const records = sudokuStore.read();
+  const existing = records.find((r) => r.name === name && r.date === date && (r.difficulty || "easy") === difficulty);
+  if (existing) return Promise.resolve(existing);
+  const record = { name, date, difficulty, mistakes, hints, timeMs, submittedAt: new Date().toISOString() };
+  records.push(record);
+  return sudokuStore.write(records).then(() => record);
+}
+
 // ---------- rate limiting ----------
 
 // Fixed-window counters per client IP. Writes are the thing worth
@@ -658,6 +790,28 @@ const ROUTES = {
   "POST /api/crossword/score": {
     limit: "write",
     handler: async (url, req) => submitCrosswordScore(crosswordStore, await readJSONBody(req)),
+  },
+
+  "GET /api/tiles/leaderboard": {
+    limit: "read",
+    handler: (url) => computeTilesLeaderboard(validDate(url.searchParams.get("date"))),
+  },
+  "POST /api/tiles/score": {
+    limit: "write",
+    handler: async (url, req) => submitTilesScore(await readJSONBody(req)),
+  },
+
+  "GET /api/sudoku/leaderboard": {
+    limit: "read",
+    handler: (url) =>
+      computeSudokuLeaderboard(
+        validDate(url.searchParams.get("date")),
+        validSudokuDiff(url.searchParams.get("difficulty") || "easy")
+      ),
+  },
+  "POST /api/sudoku/score": {
+    limit: "write",
+    handler: async (url, req) => submitSudokuScore(await readJSONBody(req)),
   },
 };
 
