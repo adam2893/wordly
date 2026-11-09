@@ -542,6 +542,19 @@
   }
   S.onModalClose("result-modal", stopCountdown);
 
+  function buildBoxedShareText() {
+    if (!state || !state.words.length) return "";
+    const n = state.words.length;
+    const head = state.mode === "daily" ? `Boxy Letters ${state.date}` : "Boxy Letters (practice)";
+    const chain = "🟩".repeat(Math.min(n, 8));
+    return `${head}\n📦 Solved in ${n}/${state.par} words · ⏱ ${S.formatTimer(state.activeMs)}\n${chain}`;
+  }
+
+  document.getElementById("share-btn")?.addEventListener("click", () => {
+    const text = buildBoxedShareText();
+    if (text && S.shareText) S.shareText(text);
+  });
+
   function showResult() {
     const n = state.words.length;
     const title =

@@ -5,6 +5,7 @@ window.Shared = (() => {
 
   const THEMES = [
     { id: "dark", name: "Dark", swatch: "#538d4e" },
+    { id: "oled", name: "OLED Black", swatch: "#000000" },
     { id: "light", name: "Light", swatch: "#6aaa64" },
     { id: "neon-standard", name: "Standard Neon", swatch: "#39ff14" },
     { id: "neon-city", name: "Neon City", swatch: "#00e5ff" },
@@ -335,10 +336,22 @@ window.Shared = (() => {
     document.documentElement.setAttribute("data-theme", themeId);
     try {
       localStorage.setItem(THEME_KEY, themeId);
+      const bg = getComputedStyle(document.documentElement).getPropertyValue("--color-bg").trim();
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta && bg) meta.setAttribute("content", bg);
     } catch {
       // ignore
     }
     renderThemeList(themeId);
+  }
+
+  async function shareText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("Copied to clipboard");
+    } catch {
+      window.prompt("Copy your results:", text);
+    }
   }
 
   function renderThemeList(activeId) {
@@ -526,6 +539,7 @@ window.Shared = (() => {
     onModalClose,
     anyModalOpen,
     applyTheme,
+    shareText,
     initShell,
     initArchive,
     wireNameGate,

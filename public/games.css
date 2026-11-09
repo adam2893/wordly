@@ -98,11 +98,53 @@ kbd {
   overflow-y: auto;
 }
 
+.menu-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .menu-greeting {
   margin: 0.1rem 0;
   text-align: center;
   font-weight: 600;
   color: var(--color-text);
+}
+
+.menu-recap-btn {
+  padding: 0.32rem 0.75rem;
+  min-width: 0;
+  font-size: 0.78rem;
+}
+
+.wordly-share-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 0.5rem 0 0.85rem;
+}
+
+.wordly-share-row {
+  display: flex;
+  gap: 4px;
+}
+
+.wordly-sq {
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 3px;
+  background: var(--color-absent);
+}
+
+.wordly-sq.correct {
+  background: var(--color-correct);
+}
+
+.wordly-sq.present {
+  background: var(--color-present);
 }
 
 .menu-grid {
@@ -1283,6 +1325,19 @@ kbd {
 [data-theme="light"] .cw-board,
 [data-theme="light"] .cw-cell.block {
   background: #1a1a1b;
+}
+
+[data-theme="oled"] .cw-board {
+  background: #33333a;
+  border-color: #3d3d42;
+}
+
+[data-theme="oled"] .cw-cell {
+  background: #1c1c22;
+}
+
+[data-theme="oled"] .cw-cell.block {
+  background: #000000;
 }
 
 .cw-cell.in-word {

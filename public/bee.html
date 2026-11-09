@@ -7,8 +7,8 @@
 <title>Spelly Bee — Wordly</title>
 <script>try{var t=localStorage.getItem("wordly:theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <link rel="icon" type="image/png" href="icon.png">
-<link rel="stylesheet" href="style.css?v=4">
-<link rel="stylesheet" href="games.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="games.css?v=5">
 </head>
 <body class="game-bee">
 <div id="toast-container" class="toast-container" aria-live="polite"></div>
@@ -109,6 +109,7 @@
     <h2>Rankings</h2>
     <p id="rank-summary" class="rank-summary"></p>
     <ul id="rank-list" class="rank-list"></ul>
+    <button id="rank-share-btn" class="primary-btn">Copy results</button>
   </div>
 </div>
 
@@ -145,13 +146,14 @@
     <h2 id="result-title">Queen Bee!</h2>
     <p id="result-text" class="result-text"></p>
     <div id="result-stats" class="result-stats"></div>
+    <button id="share-btn" class="primary-btn">Copy results</button>
     <p id="result-countdown" class="result-countdown hidden"></p>
     <button id="play-again-btn" class="primary-btn hidden">New Puzzle</button>
   </div>
 </div>
 
-<script src="common.js?v=4"></script>
-<script src="words-bee.js?v=4"></script>
-<script src="bee.js?v=4"></script>
+<script src="common.js?v=5"></script>
+<script src="words-bee.js?v=5"></script>
+<script src="bee.js?v=5"></script>
 </body>
 </html>

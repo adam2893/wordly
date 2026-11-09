@@ -20,6 +20,27 @@
   --color-danger: #d24949;
 }
 
+/* ---------- OLED Black ---------- */
+[data-theme="oled"] {
+  --color-bg: #000000;
+  --color-surface: #0a0a0c;
+  --color-text: #f5f5f7;
+  --color-text-dim: #86868b;
+  --color-border: #222226;
+  --color-border-strong: #3d3d42;
+  --color-accent: #3fb950;
+
+  --color-correct: #2ea043;
+  --color-present: #d29922;
+  --color-absent: #16161a;
+  --key-text-on-color: #ffffff;
+
+  --color-key-bg: #1c1c21;
+  --color-key-text: #f5f5f7;
+  --color-modal-overlay: rgba(0, 0, 0, 0.86);
+  --color-danger: #f85149;
+}
+
 [data-theme="light"] {
   --color-bg: #ffffff;
   --color-surface: #f4f5f6;

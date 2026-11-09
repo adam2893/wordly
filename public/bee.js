@@ -569,7 +569,27 @@
     }
   });
 
+  function buildBeeShareText() {
+    if (!state || !state.puzzle) return "";
+    const score = currentScore();
+    const max = state.puzzle.maxScore;
+    const rank = RANKS[rankIndex(score, max)][0];
+    const pangrams = state.found.filter((w) => isPangram(w, state.puzzle)).length;
+    const filled = Math.max(1, Math.round((score / Math.max(1, max)) * 7));
+    const bar = "🟨".repeat(Math.min(7, filled)) + "⬛".repeat(Math.max(0, 7 - filled));
+    const head = state.mode === "daily" ? `Spelly Bee ${state.date}` : "Spelly Bee (practice)";
+    return `${head}\n🐝 ${rank} · ${score}/${max} pts\n${bar} ${state.found.length} words${pangrams ? ` (${pangrams} 🌟)` : ""}`;
+  }
+
   document.getElementById("bee-rank").addEventListener("click", () => state && state.puzzle && showRankings());
+  document.getElementById("share-btn")?.addEventListener("click", () => {
+    const text = buildBeeShareText();
+    if (text && S.shareText) S.shareText(text);
+  });
+  document.getElementById("rank-share-btn")?.addEventListener("click", () => {
+    const text = buildBeeShareText();
+    if (text && S.shareText) S.shareText(text);
+  });
 
   function stopCountdown() {
     clearInterval(countdownTimer);

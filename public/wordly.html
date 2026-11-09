@@ -7,8 +7,8 @@
 <title>Wordly — 5 or 6 Letter Word Game</title>
 <script>try{var t=localStorage.getItem("wordly:theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <link rel="icon" type="image/png" href="icon.png">
-<link rel="stylesheet" href="style.css?v=4">
-<link rel="stylesheet" href="games.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="games.css?v=5">
 </head>
 <body>
 <div id="toast-container" class="toast-container" aria-live="polite"></div>
@@ -116,6 +116,7 @@
     <button class="modal-close" data-close="result-modal" aria-label="Close">&times;</button>
     <h2 id="result-title">Nice!</h2>
     <p id="result-word" class="result-word"></p>
+    <div id="result-grid" class="wordly-share-grid" aria-label="Your guesses"></div>
     <div id="result-stats" class="result-stats hidden">
       <div class="result-stat">
         <span class="result-stat-label">Time</span>
@@ -126,13 +127,14 @@
         <span id="result-luck" class="result-stat-value">—</span>
       </div>
     </div>
+    <button id="share-btn" class="primary-btn">Copy results</button>
     <p id="result-countdown" class="result-countdown hidden"></p>
     <button id="play-again-btn" class="primary-btn">Play Again</button>
   </div>
 </div>
 
-<script src="common.js?v=4"></script>
-<script src="words.js?v=4"></script>
-<script src="wordly.js?v=4"></script>
+<script src="common.js?v=5"></script>
+<script src="words.js?v=5"></script>
+<script src="wordly.js?v=5"></script>
 </body>
 </html>

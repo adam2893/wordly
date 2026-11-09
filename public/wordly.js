@@ -490,11 +490,31 @@
     }
   }
 
+  const LIGHT_THEMES = new Set(["light", "bubblegum", "bubblegum-3d", "desert", "dessert"]);
+
+  function buildShareText() {
+    if (!state || !state.guesses.length) return "";
+    const theme = document.documentElement.getAttribute("data-theme") || "dark";
+    const absentEmoji = LIGHT_THEMES.has(theme) ? "⬜" : "⬛";
+    const emojiMap = { correct: "🟩", present: "🟨", absent: absentEmoji };
+    const tries = state.won ? state.guesses.length : "X";
+    const label = state.mode === "daily"
+      ? `Wordly (${state.length}-letter) ${state.date}`
+      : `Wordly (${state.length}-letter practice)`;
+    const hasTime = state.won && state.mode === "daily" && state.startedAt && state.completedAt;
+    const timePart = hasTime ? ` ⏱ ${formatTimer(state.completedAt - state.startedAt)}` : "";
+    const grid = state.guesses
+      .map((g) => getPattern(g, state.answer).map((s) => emojiMap[s]).join(""))
+      .join("\n");
+    return `${label} ${tries}/${state.maxGuesses}${timePart}\n\n${grid}`;
+  }
+
   function showResult(won) {
     if (state.mode === "daily") reportDailyResult();
 
     const title = document.getElementById("result-title");
     const wordEl = document.getElementById("result-word");
+    const gridEl = document.getElementById("result-grid");
     const countdownEl = document.getElementById("result-countdown");
     const playAgainBtn = document.getElementById("play-again-btn");
     const statsEl = document.getElementById("result-stats");
@@ -509,6 +529,17 @@
     wordEl.textContent = won
       ? `You got it in ${state.guesses.length} ${state.guesses.length === 1 ? "guess" : "guesses"}.`
       : `The word was ${state.answer.toUpperCase()}.`;
+
+    if (gridEl) {
+      gridEl.innerHTML = state.guesses
+        .map(
+          (g) =>
+            `<div class="wordly-share-row">${getPattern(g, state.answer)
+              .map((s) => `<span class="wordly-sq ${s}"></span>`)
+              .join("")}</div>`
+        )
+        .join("");
+    }
 
     const hasTime = won && state.mode === "daily" && state.startedAt && state.completedAt;
     const hasLuck = won && state.mode === "daily" && Number.isInteger(state.luck);
@@ -607,6 +638,15 @@
   document.getElementById("play-again-btn").addEventListener("click", () => {
     closeModal("result-modal");
     if (state.mode === "practice") startPractice(state.length);
+  });
+
+  document.getElementById("share-btn").addEventListener("click", () => {
+    const text = buildShareText();
+    if (text && Shared.shareText) Shared.shareText(text);
+  });
+
+  boardEl.addEventListener("click", () => {
+    if (state && state.over) showResult(state.won);
   });
 
   // ---- Shell (theme, player name, modals) ----

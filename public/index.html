@@ -7,8 +7,8 @@
 <title>Wordly</title>
 <script>try{var t=localStorage.getItem("wordly:theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <link rel="icon" type="image/png" href="icon.png">
-<link rel="stylesheet" href="style.css?v=4">
-<link rel="stylesheet" href="games.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="games.css?v=5">
 </head>
 <body class="game-menu">
 <div id="toast-container" class="toast-container" aria-live="polite"></div>
@@ -26,7 +26,10 @@
 </header>
 
 <main class="menu-main">
-  <p id="menu-greeting" class="menu-greeting">Pick a game</p>
+  <div class="menu-top-row">
+    <p id="menu-greeting" class="menu-greeting">Pick a game</p>
+    <button id="menu-recap-btn" class="pill-btn menu-recap-btn hidden" type="button">Copy today's recap</button>
+  </div>
 
   <div class="menu-grid">
     <a class="game-card" href="/wordly">
@@ -187,7 +190,7 @@
   <p class="menu-foot">New daily puzzles every midnight · play missed days anytime (&#128197;) · leaderboards&nbsp;&#127942;</p>
 </main>
 
-<script src="common.js?v=4"></script>
+<script src="common.js?v=5"></script>
 <script>
 (() => {
   const S = Shared;
@@ -199,6 +202,7 @@
   }
 
   const today = S.todayDateString();
+  const recapLines = [];
   const set = (id, text, done) => {
     const el = document.getElementById(id);
     el.textContent = text;
@@ -211,6 +215,7 @@
       const s = S.load(`wordly:daily:${len}:${today}`);
       if (!s || !s.guesses || !s.guesses.length) return null;
       if (!s.over) return `${len}-letter in progress`;
+      recapLines.push(`🟩 Wordly (${len}): ${s.won ? `${s.guesses.length}/${len + 1}` : `X/${len + 1}`}`);
       return s.won ? `${len}-letter ✓ in ${s.guesses.length}` : `${len}-letter ✗`;
     })
     .filter(Boolean);
@@ -219,6 +224,7 @@
   const bee = S.load(`bee:daily:${today}`);
   if (bee && bee.found && bee.found.length) {
     set("status-bee", `Today: ${bee.rank} · ${bee.score} pts · ${bee.found.length} words`, true);
+    recapLines.push(`🐝 Spelly Bee: ${bee.rank} (${bee.score} pts)`);
   } else {
     set("status-bee", "Today's hive is waiting");
   }
@@ -226,6 +232,7 @@
   const boxed = S.load(`boxed:daily:${today}`);
   if (boxed && boxed.solved) {
     set("status-boxed", `Today: ✓ solved in ${boxed.words.length} words`, true);
+    recapLines.push(`📦 Boxy Letters: ${boxed.words.length}/${boxed.par || "—"} words`);
   } else if (boxed && boxed.started) {
     set("status-boxed", "Today: in progress", true);
   } else {
@@ -241,6 +248,7 @@
         : `Today: ✗ ${(conn.solved || []).length}/4 groups`,
       true
     );
+    recapLines.push(`🟪 Connecty: ${conn.won ? `✓ (${conn.mistakes} mistakes)` : `${(conn.solved || []).length}/4 groups`}`);
   } else if (conn && conn.started) {
     set("status-connections", `Today: in progress · ${(conn.solved || []).length}/4 groups`, true);
   } else {
@@ -254,6 +262,7 @@
       `Today: ✓ solved in ${S.formatTimer(mini.activeMs || 0)}${mini.hints ? ` · ${mini.hints} hint${mini.hints === 1 ? "" : "s"}` : " ★"}`,
       true
     );
+    recapLines.push(`✏️ Mini Crossy: ${S.formatTimer(mini.activeMs || 0)}${mini.hints ? "" : " ★"}`);
   } else if (mini && mini.started) {
     set("status-mini", `Today: in progress · ${mini.filled || 0}/${mini.total || 25}`, true);
   } else {
@@ -267,6 +276,7 @@
       `Today: ✓ solved in ${S.formatTimer(cw.activeMs || 0)}${cw.hints ? ` · ${cw.hints} hint${cw.hints === 1 ? "" : "s"}` : " ★"}`,
       true
     );
+    recapLines.push(`📰 Crossy: ${S.formatTimer(cw.activeMs || 0)}${cw.hints ? "" : " ★"}`);
   } else if (cw && cw.started) {
     set("status-crossword", `Today: in progress · ${cw.filled || 0}/${cw.total || ""}`, true);
   } else {
@@ -280,6 +290,7 @@
       `Today: ✓ cleared · ${tiles.bestCombo || 0}/45 combo${tiles.errors === 0 && tiles.bestCombo >= 45 ? " ★" : ""}`,
       true
     );
+    recapLines.push(`💠 Tiley: ${tiles.bestCombo || 0}/45 combo${tiles.errors === 0 && tiles.bestCombo >= 45 ? " ★" : ""}`);
   } else if (tiles && tiles.started) {
     set("status-tiles", `Today: in progress · ${tiles.cleared || 0}/30 cleared`, true);
   } else {
@@ -295,6 +306,7 @@
       const s = S.load(`sudoku:daily:${diff}:${today}`);
       if (!s || (!s.started && !s.over)) return null;
       if (!s.over) return `${label} in progress`;
+      recapLines.push(`🔢 Sudoky (${label}): ${S.formatTimer(s.activeMs || 0)}${!s.hints && !s.mistakes ? " ★" : ""}`);
       return `${label} ✓${!s.hints && !s.mistakes ? " ★" : ""}`;
     })
     .filter(Boolean);
@@ -303,6 +315,15 @@
     sudokuSummary.length ? `Today: ${sudokuSummary.join(" · ")}` : "Today's grids are waiting",
     sudokuSummary.length
   );
+
+  const recapBtn = document.getElementById("menu-recap-btn");
+  if (recapBtn && recapLines.length) {
+    recapBtn.classList.remove("hidden");
+    recapBtn.addEventListener("click", () => {
+      const header = `Wordly Daily Recap · ${today}`;
+      if (S.shareText) S.shareText(`${header}\n${recapLines.join("\n")}`);
+    });
+  }
 
   greet();
 })();
