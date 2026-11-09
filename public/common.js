@@ -28,6 +28,34 @@ window.Shared = (() => {
 
   const THEME_KEY = "wordly:theme";
   const PLAYER_KEY = "wordly:playerName";
+  const PIN_KEY = "wordly:playerPin";
+  const SYNC_KEY_RE = /^(wordly|bee|boxed|connections|strands|mini|crossword|tiles|sudoku):(daily:|theme|hardMode|length|difficulty)/;
+
+  let syncDebounce = null;
+  let deferredInstallPrompt = null;
+
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    const btn = document.getElementById("pwa-install-btn");
+    if (btn) btn.classList.remove("hidden");
+  });
+
+  // Prevent accidental double-tap or pinch zoom on phones during fast play.
+  document.addEventListener(
+    "dblclick",
+    (e) => {
+      if (!e.target.closest("input, textarea")) e.preventDefault();
+    },
+    { passive: false }
+  );
+  document.addEventListener("gesturestart", (e) => e.preventDefault(), { passive: false });
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    });
+  }
 
   // ---------- storage ----------
 
@@ -43,9 +71,109 @@ window.Shared = (() => {
   function save(key, value) {
     try {
       localStorage.setItem(key, JSON.stringify(value));
+      if (SYNC_KEY_RE.test(key)) scheduleCloudSync();
     } catch {
       // Storage full or blocked - progress just won't survive a reload.
     }
+  }
+
+  function collectSyncState() {
+    const out = {};
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && SYNC_KEY_RE.test(k)) {
+          out[k] = localStorage.getItem(k);
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return out;
+  }
+
+  function mergeLocalEntry(oldRaw, newRaw) {
+    if (!oldRaw) return newRaw;
+    if (!newRaw) return oldRaw;
+    try {
+      const a = JSON.parse(oldRaw);
+      const b = JSON.parse(newRaw);
+      if (a && typeof a === "object" && b && typeof b === "object") {
+        const aDone = !!(a.over || a.solved);
+        const bDone = !!(b.over || b.solved);
+        if (aDone && !bDone) return oldRaw;
+        if (bDone && !aDone) return newRaw;
+        const aProg = (a.guesses?.length || 0) + (a.found?.length || 0) + (a.words?.length || 0) + (a.cleared || 0) + (a.filled || 0) + (a.activeMs || 0);
+        const bProg = (b.guesses?.length || 0) + (b.found?.length || 0) + (b.words?.length || 0) + (b.cleared || 0) + (b.filled || 0) + (b.activeMs || 0);
+        return bProg >= aProg ? newRaw : oldRaw;
+      }
+    } catch {
+      // scalar
+    }
+    return newRaw;
+  }
+
+  function applySyncedState(remoteState) {
+    if (!remoteState || typeof remoteState !== "object") return 0;
+    let changed = 0;
+    try {
+      for (const [k, v] of Object.entries(remoteState)) {
+        if (!SYNC_KEY_RE.test(k) || typeof v !== "string") continue;
+        const cur = localStorage.getItem(k);
+        const merged = mergeLocalEntry(cur, v);
+        if (merged !== cur) {
+          localStorage.setItem(k, merged);
+          changed++;
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return changed;
+  }
+
+  function getPlayerPin() {
+    try {
+      return localStorage.getItem(PIN_KEY) || "";
+    } catch {
+      return "";
+    }
+  }
+
+  function setPlayerPin(pin) {
+    try {
+      localStorage.setItem(PIN_KEY, (pin || "").trim().slice(0, 16));
+    } catch {
+      // ignore
+    }
+  }
+
+  async function syncProfile({ silent = false } = {}) {
+    const name = getPlayerName();
+    if (!name) return false;
+    try {
+      const res = await postJSON("/api/profile/sync", {
+        name,
+        pin: getPlayerPin(),
+        state: collectSyncState(),
+      });
+      const updated = applySyncedState(res.state);
+      if (!silent) {
+        showToast(updated ? `Synced (${updated} updated)` : "Profile synced ☁️");
+      }
+      return updated > 0;
+    } catch (err) {
+      if (!silent) showToast(err.message || "Sync unavailable");
+      return false;
+    }
+  }
+
+  function scheduleCloudSync() {
+    if (!getPlayerName()) return;
+    clearTimeout(syncDebounce);
+    syncDebounce = setTimeout(() => {
+      syncProfile({ silent: true });
+    }, 1800);
   }
 
   // ---------- dates & timers ----------
@@ -385,10 +513,19 @@ window.Shared = (() => {
         <div id="name-modal" class="modal-overlay hidden">
           <div class="modal">
             <button class="modal-close" data-close="name-modal" aria-label="Close">&times;</button>
-            <h2>Player Profile</h2>
-            <p>This name is used for the leaderboards in every game.</p>
+            <h2>Player Profile &amp; Sync</h2>
+            <p>Your name is used for leaderboards and cross-device progress sync.</p>
             <input id="name-input" class="text-input" type="text" maxlength="40" placeholder="Your name" autocomplete="off" />
-            <button id="name-save-btn" class="primary-btn">Save</button>
+            <input id="pin-input" class="text-input" type="password" inputmode="numeric" maxlength="16" placeholder="Optional 4-digit sync PIN" autocomplete="off" />
+            <button id="name-save-btn" class="primary-btn">Save &amp; Sync</button>
+            <div class="profile-sync-box">
+              <div class="profile-sync-row">
+                <button id="sync-now-btn" class="pill-btn" type="button">Sync Now &#9729;</button>
+                <button id="export-code-btn" class="pill-btn" type="button">Copy Backup Code</button>
+                <button id="import-code-btn" class="pill-btn" type="button">Restore Code</button>
+              </div>
+              <button id="pwa-install-btn" class="pill-btn hidden" type="button" style="width:100%;margin-top:0.45rem">Install App to Home Screen &#128241;</button>
+            </div>
           </div>
         </div>`
       );
@@ -417,25 +554,79 @@ window.Shared = (() => {
     if (playerBtn) {
       playerBtn.addEventListener("click", () => {
         document.getElementById("name-input").value = getPlayerName();
+        const pinEl = document.getElementById("pin-input");
+        if (pinEl) pinEl.value = getPlayerPin();
         openModal("name-modal");
       });
     }
 
-    const saveName = () => {
+    const saveName = async () => {
       const input = document.getElementById("name-input");
+      const pinEl = document.getElementById("pin-input");
       const name = input.value.trim();
       if (!name) {
         input.focus();
         return;
       }
       setPlayerName(name);
+      if (pinEl) setPlayerPin(pinEl.value);
       closeModal("name-modal");
+      const pulled = await syncProfile({ silent: false });
       if (onNameSaved) onNameSaved(name);
+      if (pulled) location.reload();
     };
     document.getElementById("name-save-btn").addEventListener("click", saveName);
     document.getElementById("name-input").addEventListener("keydown", (e) => {
       if (e.key === "Enter") saveName();
     });
+
+    document.getElementById("sync-now-btn")?.addEventListener("click", async () => {
+      const input = document.getElementById("name-input");
+      const pinEl = document.getElementById("pin-input");
+      if (input && input.value.trim()) setPlayerName(input.value.trim());
+      if (pinEl) setPlayerPin(pinEl.value);
+      const pulled = await syncProfile({ silent: false });
+      if (pulled) location.reload();
+    });
+
+    document.getElementById("export-code-btn")?.addEventListener("click", () => {
+      const payload = {
+        name: getPlayerName(),
+        state: collectSyncState(),
+      };
+      const code = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+      shareText(code);
+    });
+
+    document.getElementById("import-code-btn")?.addEventListener("click", () => {
+      const code = window.prompt("Paste your Wordly backup code:");
+      if (!code || !code.trim()) return;
+      try {
+        const parsed = JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
+        if (parsed.name) setPlayerName(parsed.name);
+        const count = applySyncedState(parsed.state || {});
+        showToast(`Restored ${count} entries`);
+        closeModal("name-modal");
+        setTimeout(() => location.reload(), 350);
+      } catch {
+        showToast("Invalid backup code");
+      }
+    });
+
+    document.getElementById("pwa-install-btn")?.addEventListener("click", async () => {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice.catch(() => {});
+      deferredInstallPrompt = null;
+      document.getElementById("pwa-install-btn")?.classList.add("hidden");
+    });
+
+    // Background sync on page open if player name is already set.
+    if (getPlayerName()) {
+      setTimeout(() => {
+        syncProfile({ silent: true });
+      }, 600);
+    }
 
     document.querySelectorAll("[data-close]").forEach((btn) => {
       btn.addEventListener("click", () => closeModal(btn.dataset.close));
@@ -540,6 +731,7 @@ window.Shared = (() => {
     anyModalOpen,
     applyTheme,
     shareText,
+    syncProfile,
     initShell,
     initArchive,
     wireNameGate,

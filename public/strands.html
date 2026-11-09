@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#121213">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Strandy — Wordly</title>
+<script>try{var t=localStorage.getItem("wordly:theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="games.css?v=6">
+</head>
+<body>
+<div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+<header class="app-header">
+  <div class="header-row title-row">
+    <div class="header-side">
+      <a href="/" class="icon-btn" aria-label="All games" title="All games">&#8962;</a>
+      <button id="help-btn" class="icon-btn" aria-label="How to play" title="How to play">?</button>
+    </div>
+    <h1 class="app-title">STRANDY</h1>
+    <div class="header-side header-side-end">
+      <button id="player-btn" class="icon-btn" aria-label="Player profile" title="Player profile">&#128100;</button>
+    </div>
+  </div>
+
+  <div class="header-row controls-row">
+    <div class="mode-toggle" role="group" aria-label="Game mode">
+      <button class="mode-btn active" data-mode="daily">Daily</button>
+      <button class="mode-btn" data-mode="practice">Practice</button>
+    </div>
+    <button id="theme-btn" class="icon-btn" aria-label="Change theme" title="Change theme">&#9681;</button>
+    <button id="leaderboard-btn" class="icon-btn" aria-label="Leaderboard" title="Leaderboard">&#127942;</button>
+    <button id="new-game-btn" class="icon-btn" aria-label="New puzzle" title="New puzzle" style="visibility:hidden">&#8635;</button>
+  </div>
+</header>
+
+<main class="game-main strands-main">
+  <div id="name-gate" class="name-gate hidden">
+    <h2>Who's playing?</h2>
+    <p>Pick a name so today's Strandy result counts on the leaderboard.</p>
+    <input id="gate-name-input" class="text-input" type="text" maxlength="40" placeholder="Your name" autocomplete="off" />
+    <button id="gate-name-btn" class="primary-btn">Start Daily Strandy</button>
+  </div>
+
+  <div id="strands-game" class="strands-game hidden">
+    <div class="strands-top">
+      <div class="strands-theme-box">
+        <span class="strands-theme-label">Today's Theme</span>
+        <span id="strands-theme-clue" class="strands-theme-clue">—</span>
+      </div>
+      <div class="strands-meta-col">
+        <span id="strands-progress" class="strands-progress">0 / 0 found</span>
+        <div id="daily-timer" class="daily-timer hidden">0:00</div>
+      </div>
+    </div>
+
+    <div id="strands-current" class="strands-current" aria-live="polite">Drag or tap letters</div>
+
+    <div id="strands-board-wrap" class="strands-board-wrap">
+      <svg id="strands-svg" class="strands-svg" viewBox="0 0 300 400" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <div id="strands-board" class="strands-board" role="grid" aria-label="6 by 8 letter grid"></div>
+    </div>
+
+    <div class="bee-controls strands-controls">
+      <button id="strands-hint" class="pill-btn" type="button">Hint &#128161;</button>
+      <button id="strands-clear" class="pill-btn" type="button" disabled>Clear</button>
+      <button id="strands-submit" class="pill-btn conn-submit" type="button" disabled>Submit</button>
+    </div>
+  </div>
+</main>
+
+<!-- How to Play -->
+<div id="help-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <button class="modal-close" data-close="help-modal" aria-label="Close">&times;</button>
+    <h2>How to Play Strandy</h2>
+    <p>Uncover all hidden theme words and the <strong>Spangram</strong> to fill every letter of the 6&times;8 board.</p>
+    <ul class="help-list">
+      <li><strong>Theme words</strong> (<span style="color:#4ea8de;font-weight:700">blue</span>) relate to Today's Theme clue.</li>
+      <li>The <strong>Spangram</strong> (<span style="color:#e9c46a;font-weight:700">gold</span>) describes the theme and touches two opposite sides of the board.</li>
+      <li><strong>Drag</strong> your finger across adjacent letters (up, down, left, right, or diagonal), or <strong>tap</strong> letters one by one and tap the last letter again (or <strong>Submit</strong>).</li>
+      <li>No theme words overlap, and every letter on the board is used once.</li>
+      <li>Need a nudge? Tap <strong>Hint &#128161;</strong> once to highlight a theme word's letters, and a second time to reveal its letter order.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Leaderboard -->
+<div id="leaderboard-modal" class="modal-overlay hidden">
+  <div class="modal modal-wide">
+    <button class="modal-close" data-close="leaderboard-modal" aria-label="Close">&times;</button>
+    <h2>Strandy Leaderboard</h2>
+    <div class="leaderboard-tabs" role="group" aria-label="Leaderboard view">
+      <button class="lb-tab active" data-lb-view="today">Today</button>
+      <button class="lb-tab" data-lb-view="all">All-time</button>
+    </div>
+    <div id="leaderboard-content" class="leaderboard-content">
+      <p class="lb-status">Loading…</p>
+    </div>
+  </div>
+</div>
+
+<!-- Result -->
+<div id="result-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <button class="modal-close" data-close="result-modal" aria-label="Close">&times;</button>
+    <h2 id="result-title">Strandy Solved!</h2>
+    <p id="result-subtitle" class="answers-summary"></p>
+    <div id="result-grid" class="strands-share-grid" aria-label="Your solve path"></div>
+    <div id="result-stats" class="result-stats"></div>
+    <button id="share-btn" class="primary-btn">Copy results</button>
+    <p id="result-countdown" class="result-countdown hidden"></p>
+    <button id="play-again-btn" class="primary-btn hidden">New Puzzle</button>
+  </div>
+</div>
+
+<script src="common.js?v=6"></script>
+<script src="words-strands.js?v=6" defer></script>
+<script src="strands.js?v=6" defer></script>
+</body>
+</html>

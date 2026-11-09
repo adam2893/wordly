@@ -23,8 +23,49 @@
   const STORAGE_KEYS = {
     length: "wordly:length",
     mode: "wordly:mode",
+    hardMode: "wordly:hardMode",
     daily: (length, date) => `wordly:daily:${length}:${date}`,
   };
+
+  function isHardModePref() {
+    try {
+      return localStorage.getItem(STORAGE_KEYS.hardMode) === "1";
+    } catch {
+      return false;
+    }
+  }
+
+  function ordinal(n) {
+    return ["1st", "2nd", "3rd", "4th", "5th", "6th"][n - 1] || `${n}th`;
+  }
+
+  function checkHardModeViolation(guess) {
+    if (!state || !state.hardMode || !state.guesses.length) return null;
+    for (const prev of state.guesses) {
+      const pattern = getPattern(prev, state.answer);
+      for (let i = 0; i < prev.length; i++) {
+        if (pattern[i] === "correct" && guess[i] !== prev[i]) {
+          return `${ordinal(i + 1)} letter must be ${prev[i].toUpperCase()}`;
+        }
+      }
+      const reqCounts = {};
+      for (let i = 0; i < prev.length; i++) {
+        if (pattern[i] === "correct" || pattern[i] === "present") {
+          reqCounts[prev[i]] = (reqCounts[prev[i]] || 0) + 1;
+        }
+      }
+      const guessCounts = {};
+      for (const ch of guess) guessCounts[ch] = (guessCounts[ch] || 0) + 1;
+      for (const [ch, needed] of Object.entries(reqCounts)) {
+        if ((guessCounts[ch] || 0) < needed) {
+          return needed > 1
+            ? `Guess must contain ${needed} ${ch.toUpperCase()}'s`
+            : `Guess must contain ${ch.toUpperCase()}`;
+        }
+      }
+    }
+    return null;
+  }
 
   /** @type {{mode:string, length:number, answer:string, guesses:string[], current:string, maxGuesses:number, over:boolean, won:boolean, date:string, submitted:boolean, startedAt:number|null, completedAt:number|null, luck:number|null, guessSet:Set<string>, keyStates:Map<string,string>}} */
   let state;
@@ -80,7 +121,11 @@
   }
 
   function saveDailyState(length, date, data) {
-    localStorage.setItem(STORAGE_KEYS.daily(length, date), JSON.stringify(data));
+    if (Shared.save) {
+      Shared.save(STORAGE_KEYS.daily(length, date), data);
+    } else {
+      localStorage.setItem(STORAGE_KEYS.daily(length, date), JSON.stringify(data));
+    }
   }
 
   // ---------- game lifecycle ----------
@@ -113,6 +158,7 @@
       maxGuesses: maxGuessesFor(length),
       over: saved ? saved.over : false,
       won: saved ? saved.won : false,
+      hardMode: saved && typeof saved.hardMode === "boolean" ? saved.hardMode : isHardModePref(),
       submitted: saved ? !!saved.submitted : false,
       startedAt: saved ? saved.startedAt || null : null,
       completedAt: saved ? saved.completedAt || null : null,
@@ -149,6 +195,7 @@
       maxGuesses: maxGuessesFor(length),
       over: false,
       won: false,
+      hardMode: isHardModePref(),
       submitted: true,
       guessSet: guessSetFor(length),
       keyStates: new Map(),
@@ -174,6 +221,12 @@
     });
     const newGameBtn = document.getElementById("new-game-btn");
     newGameBtn.style.visibility = state.mode === "practice" ? "visible" : "hidden";
+    const hardBtn = document.getElementById("hard-mode-btn");
+    if (hardBtn) {
+      const active = state && typeof state.hardMode === "boolean" ? state.hardMode : isHardModePref();
+      hardBtn.classList.toggle("active", active);
+      hardBtn.setAttribute("aria-pressed", active ? "true" : "false");
+    }
   }
 
   function showNameGate() {
@@ -374,6 +427,7 @@
       guesses: state.guesses,
       over: state.over,
       won: state.won,
+      hardMode: !!state.hardMode,
       submitted: state.submitted,
       startedAt: state.startedAt,
       completedAt: state.completedAt,
@@ -412,6 +466,12 @@
     if (!state.guessSet.has(guess)) {
       shakeCurrentRow();
       showToast("Not in word list");
+      return;
+    }
+    const hardErr = checkHardModeViolation(guess);
+    if (hardErr) {
+      shakeCurrentRow();
+      showToast(hardErr);
       return;
     }
 
@@ -468,6 +528,7 @@
           length: state.length,
           date: state.date,
           won: state.won,
+          hardMode: !!state.hardMode,
           guesses: state.won ? state.guesses.length : null,
           timeMs: state.won && state.startedAt && state.completedAt
             ? state.completedAt - state.startedAt
@@ -498,6 +559,7 @@
     const absentEmoji = LIGHT_THEMES.has(theme) ? "⬜" : "⬛";
     const emojiMap = { correct: "🟩", present: "🟨", absent: absentEmoji };
     const tries = state.won ? state.guesses.length : "X";
+    const hardStar = state.hardMode ? "*" : "";
     const label = state.mode === "daily"
       ? `Wordly (${state.length}-letter) ${state.date}`
       : `Wordly (${state.length}-letter practice)`;
@@ -506,7 +568,7 @@
     const grid = state.guesses
       .map((g) => getPattern(g, state.answer).map((s) => emojiMap[s]).join(""))
       .join("\n");
-    return `${label} ${tries}/${state.maxGuesses}${timePart}\n\n${grid}`;
+    return `${label} ${tries}/${state.maxGuesses}${hardStar}${timePart}\n\n${grid}`;
   }
 
   function showResult(won) {
@@ -633,6 +695,24 @@
 
   document.getElementById("new-game-btn").addEventListener("click", () => {
     if (state.mode === "practice") startPractice(state.length);
+  });
+
+  document.getElementById("hard-mode-btn")?.addEventListener("click", () => {
+    if (!state) return;
+    if (!state.hardMode && state.guesses && state.guesses.length > 0 && !state.over) {
+      showToast("Hard Mode can only be enabled at the start of a word");
+      return;
+    }
+    const next = !state.hardMode;
+    state.hardMode = next;
+    try {
+      localStorage.setItem(STORAGE_KEYS.hardMode, next ? "1" : "0");
+    } catch {
+      // ignore
+    }
+    persistDailyProgress();
+    syncHeaderButtons();
+    showToast(next ? "Hard Mode ON *" : "Hard Mode OFF");
   });
 
   document.getElementById("play-again-btn").addEventListener("click", () => {

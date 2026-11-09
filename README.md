@@ -7,7 +7,7 @@
 
 **Docker image:** [`ghcr.io/adam2893/wordly:latest`](https://github.com/adam2893/wordly/pkgs/container/wordly) (`docker pull ghcr.io/adam2893/wordly:latest`)
 
-A small, self-hosted collection of daily word and logic games: **Wordly** (guess the 5 or 6 letter word), **Spelly Bee**, **Boxy Letters**, **Connecty**, **Mini Crossy**, **Crossy**, **Tiley**, and **Sudoky**. Mobile-friendly, no accounts, shared leaderboards for everyone on your server, plus a **Daily Archive** (📅) to catch up on any past day you missed. The home page (`/`) is a game menu showing today's progress in each game, and every game shares the same themes, player name, and leaderboard backend.
+A small, self-hosted collection of daily word and logic games: **Wordly** (guess the 5 or 6 letter word, with optional **Hard Mode\***), **Spelly Bee**, **Boxy Letters**, **Connecty**, **Strandy** (6×8 themed word trails + Spangram), **Mini Crossy**, **Crossy**, **Tiley**, and **Sudoky**. Phone-first and installable as a **PWA** with offline play, accidental-zoom protection, **20 themes** (including **OLED Black**), cross-device profile sync, shared leaderboards for everyone on your server, and a **Daily Archive** (📅) to catch up on any past day you missed. The home page (`/`) is a game menu showing today's progress in each game plus a 1-click **Daily Recap** share button.
 
 ## Play against your family and friends
 
@@ -73,6 +73,14 @@ A few of the themes: Forest, Bubblegum 3D, Synthwave and Ocean. Pick yours with 
 - **Daily** puzzle shared by everyone (numbered from #1 on 2026-11-02), **Practice** plays any puzzle from the archive, **Yesterday's answers**, active-play timer, and a copyable emoji result grid.
 - **Leaderboard**: *Today* (solved, mistakes, time) and *All-time* (played, win %, perfect games, average mistakes, best time, streaks). First finished game of the day counts.
 
+### Strandy (`/strands`)
+
+- Trace winding 8-directional letter paths across a **6×8 grid** (48 letters) to uncover every hidden **Theme Word** (`🔵`) and the **Spangram** (`🟡`) that stretches between two opposite edges of the board. Every cell belongs to exactly one word.
+- Supports smooth **touch drag** on phones as well as **tap-to-trace** (tap adjacent letters and tap the last letter again to submit).
+- Stuck? Tap **Hint 💡** once to outline the cells of an unfound theme word, or a second time to highlight its starting letter. Solving with 0 hints earns a **Flawless ★** badge.
+- **Daily** + **Practice** modes, **Daily Archive** (📅), active-play timer, and a copyable `🔵`/`🟡`/`💡` emoji result summary.
+- **Leaderboard**: *Today* (hints, time) and *All-time* (solved, flawless ★ solves, average hints, best time, streaks).
+
 ### Mini Crossy (`/mini`) & Crossy (`/crossword`)
 
 - **Mini Crossy** is a bite-sized 5×5 daily crossword; **Crossy** is a full-sized daily crossword, both sourced from community puzzles on [Crosshare](https://crosshare.org) with constructor credit in the byline.
@@ -98,8 +106,11 @@ A few of the themes: Forest, Bubblegum 3D, Synthwave and Ocean. Pick yours with 
 
 ### Shared
 
+- **Installable PWA & Phone-First UX** — install to your iOS/Android home screen for fullscreen standalone play (`manifest.json` + offline Service Worker `sw.js`), with anti-zoom touch handling so rapid double-tapping keys never accidentally zooms the viewport.
+- **Cross-Device Profile Sync & Backup Code** — sync your daily progress, archive history, theme, and player profile across phone, tablet, and desktop via server-side profile sync (with optional PIN) or a portable Backup Code inside the Player Profile (`👤`) menu.
+- **Emoji Share & Daily Recap** — every game has a **Share result** button with spoiler-free emoji grids (`🟩🟨⬛`, `🔵🟡💡`, etc.), and the main menu includes a **Copy today's recap** button that bundles all your completed games for the day into one message.
 - **Daily Archive (📅)** — missed a day? Tap the calendar button in any game's header to browse and play the past 30 days of daily puzzles, complete with completion badges (`✓`, `✗`, `•••`) and leaderboard submission.
-- **19 themes** — Dark, Light, Standard Neon, Neon City, Synthwave, Bubblegum 3D, Ocean, Sunset, Forest, Halloween, Christmas, Neon 80s, Spooky, Retro Terminal, Bubblegum, Art Deco, Tropical, Desert, Dessert — picked from the palette button on any page, saved across visits and games.
+- **20 themes** — Dark, **OLED Black** (`#000000`), Light, Standard Neon, Neon City, Synthwave, Bubblegum 3D, Ocean, Sunset, Forest, Halloween, Christmas, Neon 80s, Spooky, Retro Terminal, Bubblegum, Art Deco, Tropical, Desert, Dessert — picked from the palette button on any page, saved across visits and games.
 - **Player name** (no password) set once, used by every game's leaderboard.
 
 ## Architecture

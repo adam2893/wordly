@@ -2,13 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#121213">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Wordly</title>
 <script>try{var t=localStorage.getItem("wordly:theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <link rel="icon" type="image/png" href="icon.png">
-<link rel="stylesheet" href="style.css?v=5">
-<link rel="stylesheet" href="games.css?v=5">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="games.css?v=6">
 </head>
 <body class="game-menu">
 <div id="toast-container" class="toast-container" aria-live="polite"></div>
@@ -83,6 +87,29 @@
         <span class="game-name">Connecty</span>
         <span class="game-desc">Sort 16 words into four hidden groups.</span>
         <span id="status-connections" class="game-status"></span>
+      </span>
+    </a>
+
+    <a class="game-card" href="/strands">
+      <span class="game-icon icon-strands" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <polyline points="22,22 50,50 78,22 78,50" fill="none" stroke="#4ea8de" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></polyline>
+          <polyline points="22,78 50,78 78,78" fill="none" stroke="var(--bee-center, var(--color-present, #b59f3b))" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></polyline>
+          <circle cx="22" cy="22" r="9.5" fill="#4ea8de"></circle>
+          <circle cx="50" cy="22" r="8" fill="var(--color-key-bg, #818384)"></circle>
+          <circle cx="78" cy="22" r="9.5" fill="#4ea8de"></circle>
+          <circle cx="22" cy="50" r="8" fill="var(--color-key-bg, #818384)"></circle>
+          <circle cx="50" cy="50" r="9.5" fill="#4ea8de"></circle>
+          <circle cx="78" cy="50" r="9.5" fill="#4ea8de"></circle>
+          <circle cx="22" cy="78" r="9.5" fill="var(--bee-center, var(--color-present, #b59f3b))"></circle>
+          <circle cx="50" cy="78" r="9.5" fill="var(--bee-center, var(--color-present, #b59f3b))"></circle>
+          <circle cx="78" cy="78" r="9.5" fill="var(--bee-center, var(--color-present, #b59f3b))"></circle>
+        </svg>
+      </span>
+      <span class="game-info">
+        <span class="game-name">Strandy</span>
+        <span class="game-desc">Uncover themed word trails and the Spangram.</span>
+        <span id="status-strands" class="game-status"></span>
       </span>
     </a>
 
@@ -190,7 +217,7 @@
   <p class="menu-foot">New daily puzzles every midnight · play missed days anytime (&#128197;) · leaderboards&nbsp;&#127942;</p>
 </main>
 
-<script src="common.js?v=5"></script>
+<script src="common.js?v=6"></script>
 <script>
 (() => {
   const S = Shared;
@@ -205,6 +232,7 @@
   const recapLines = [];
   const set = (id, text, done) => {
     const el = document.getElementById(id);
+    if (!el) return;
     el.textContent = text;
     el.classList.toggle("done", !!done);
   };
@@ -215,8 +243,9 @@
       const s = S.load(`wordly:daily:${len}:${today}`);
       if (!s || !s.guesses || !s.guesses.length) return null;
       if (!s.over) return `${len}-letter in progress`;
-      recapLines.push(`🟩 Wordly (${len}): ${s.won ? `${s.guesses.length}/${len + 1}` : `X/${len + 1}`}`);
-      return s.won ? `${len}-letter ✓ in ${s.guesses.length}` : `${len}-letter ✗`;
+      const star = s.hardMode ? "*" : "";
+      recapLines.push(`🟩 Wordly (${len}): ${s.won ? `${s.guesses.length}/${len + 1}${star}` : `X/${len + 1}${star}`}`);
+      return s.won ? `${len}-letter ✓ in ${s.guesses.length}${star}` : `${len}-letter ✗`;
     })
     .filter(Boolean);
   set("status-wordly", wordly.length ? `Today: ${wordly.join(" · ")}` : "Today's words are waiting", wordly.length);
@@ -253,6 +282,20 @@
     set("status-connections", `Today: in progress · ${(conn.solved || []).length}/4 groups`, true);
   } else {
     set("status-connections", "Today's puzzle is waiting");
+  }
+
+  const strands = S.load(`strands:daily:${today}`);
+  if (strands && strands.over) {
+    set(
+      "status-strands",
+      `Today: ✓ solved in ${S.formatTimer(strands.activeMs || 0)}${strands.hintsUsed ? ` · ${strands.hintsUsed} hint${strands.hintsUsed === 1 ? "" : "s"}` : " ★"}`,
+      true
+    );
+    recapLines.push(`🔵 Strandy: ${S.formatTimer(strands.activeMs || 0)}${strands.hintsUsed ? "" : " ★"}`);
+  } else if (strands && strands.started) {
+    set("status-strands", `Today: in progress · ${(strands.found || []).length}/${strands.total || 6} found`, true);
+  } else {
+    set("status-strands", "Today's strands are waiting");
   }
 
   const mini = S.load(`mini:daily:${today}`);

@@ -74,6 +74,8 @@ const miniStore = createStore("mini.json");
 const crosswordStore = createStore("crossword.json");
 const tilesStore = createStore("tiles.json");
 const sudokuStore = createStore("sudoku.json");
+const strandsStore = createStore("strands.json");
+const profilesStore = createStore("profiles.json");
 
 // ---------- shared helpers ----------
 
@@ -161,11 +163,13 @@ function computeWordlyLeaderboard(length) {
   const result = [];
   for (const [name, games] of byPlayer) {
     const won = games.filter((g) => g.won);
+    const hardWins = won.filter((g) => g.hardMode).length;
     const played = games.length;
     result.push({
       name,
       played,
       wins: won.length,
+      hardWins,
       winPct: played ? Math.round((won.length / played) * 100) : 0,
       ...streaks(games, (g) => g.won),
       avgGuesses: average(won.map((g) => g.guesses), 1),
@@ -178,7 +182,7 @@ function computeWordlyLeaderboard(length) {
 }
 
 function submitWordlyScore(body) {
-  const { length, won, guesses, timeMs, luck } = body;
+  const { length, won, guesses, timeMs, luck, hardMode } = body;
   const name = validName(body.name);
   const date = validDate(body.date);
   if (length !== 5 && length !== 6) throw new Error("invalid length");
@@ -192,6 +196,7 @@ function submitWordlyScore(body) {
     length,
     date,
     won,
+    hardMode: !!hardMode,
     guesses: won ? guesses : null,
     timeMs: won ? time : null,
     luck: won && luck !== undefined && luck !== null ? luck : null,
@@ -629,13 +634,13 @@ function sendJSON(res, status, obj, headers = {}) {
   res.end(body);
 }
 
-function readBody(req) {
+function readBody(req, maxBytes = 10_000) {
   return new Promise((resolve, reject) => {
     let data = "";
     let size = 0;
     req.on("data", (chunk) => {
       size += chunk.length;
-      if (size > 10_000) {
+      if (size > maxBytes) {
         reject(new Error("payload too large"));
         req.destroy();
         return;
@@ -647,13 +652,83 @@ function readBody(req) {
   });
 }
 
-async function readJSONBody(req) {
-  const raw = await readBody(req);
+async function readJSONBody(req, maxBytes = 10_000) {
+  const raw = await readBody(req, maxBytes);
   try {
     return JSON.parse(raw);
   } catch {
     throw new Error("invalid JSON");
   }
+}
+
+// ---------- Cross-Device Profile Sync ----------
+
+const SYNC_KEY_RE = /^(wordly|bee|boxed|connections|strands|mini|crossword|tiles|sudoku):(daily:|theme|hardMode|length|difficulty)/;
+
+function mergeSyncValue(oldRaw, newRaw) {
+  if (!oldRaw) return newRaw;
+  if (!newRaw) return oldRaw;
+  try {
+    const a = JSON.parse(oldRaw);
+    const b = JSON.parse(newRaw);
+    if (a && typeof a === "object" && b && typeof b === "object") {
+      const aDone = !!(a.over || a.solved);
+      const bDone = !!(b.over || b.solved);
+      if (aDone && !bDone) return oldRaw;
+      if (bDone && !aDone) return newRaw;
+      const aProg = (a.guesses?.length || 0) + (a.found?.length || 0) + (a.words?.length || 0) + (a.cleared || 0) + (a.filled || 0) + (a.activeMs || 0);
+      const bProg = (b.guesses?.length || 0) + (b.found?.length || 0) + (b.words?.length || 0) + (b.cleared || 0) + (b.filled || 0) + (b.activeMs || 0);
+      return bProg >= aProg ? newRaw : oldRaw;
+    }
+  } catch {
+    // Non-JSON scalar preference
+  }
+  return newRaw;
+}
+
+function getProfileSync(nameRaw, pinRaw) {
+  const name = validName(nameRaw);
+  const pin = typeof pinRaw === "string" ? pinRaw.trim().slice(0, 16) : "";
+  const profiles = profilesStore.read();
+  const entry = profiles.find((p) => p.name.toLowerCase() === name.toLowerCase());
+  if (!entry) return { name, state: {}, hasPin: false };
+  if (entry.pin && entry.pin !== pin) throw new Error("invalid PIN for this player profile");
+  return { name: entry.name, state: entry.state || {}, hasPin: !!entry.pin, updatedAt: entry.updatedAt };
+}
+
+function saveProfileSync(body) {
+  const name = validName(body.name);
+  const pin = typeof body.pin === "string" ? body.pin.trim().slice(0, 16) : "";
+  const incoming = body.state && typeof body.state === "object" ? body.state : {};
+  const profiles = profilesStore.read();
+  const idx = profiles.findIndex((p) => p.name.toLowerCase() === name.toLowerCase());
+  const existing = idx >= 0 ? profiles[idx] : null;
+  if (existing && existing.pin && existing.pin !== pin) {
+    throw new Error("invalid PIN for this player profile");
+  }
+  const merged = existing && existing.state ? { ...existing.state } : {};
+  const keys = Object.keys(incoming).slice(0, 450);
+  for (const k of keys) {
+    if (!SYNC_KEY_RE.test(k)) continue;
+    const v = incoming[k];
+    if (typeof v === "string" && v.length <= 16_000) {
+      merged[k] = mergeSyncValue(merged[k], v);
+    }
+  }
+  const record = {
+    name: existing ? existing.name : name,
+    pin: pin || (existing ? existing.pin || "" : ""),
+    state: merged,
+    updatedAt: new Date().toISOString(),
+  };
+  if (idx >= 0) profiles[idx] = record;
+  else profiles.push(record);
+  return profilesStore.write(profiles).then(() => ({
+    name: record.name,
+    state: record.state,
+    hasPin: !!record.pin,
+    updatedAt: record.updatedAt,
+  }));
 }
 
 // Gzipped copies of text assets, cached by path + mtime. The Letter Boxed
@@ -823,6 +898,24 @@ const ROUTES = {
   "POST /api/sudoku/score": {
     limit: "write",
     handler: async (url, req) => submitSudokuScore(await readJSONBody(req)),
+  },
+
+  "GET /api/strands/leaderboard": {
+    limit: "read",
+    handler: (url) => computeCrosswordLeaderboard(strandsStore, validDate(url.searchParams.get("date"))),
+  },
+  "POST /api/strands/score": {
+    limit: "write",
+    handler: async (url, req) => submitCrosswordScore(strandsStore, await readJSONBody(req)),
+  },
+
+  "GET /api/profile/sync": {
+    limit: "read",
+    handler: (url) => getProfileSync(url.searchParams.get("name"), url.searchParams.get("pin")),
+  },
+  "POST /api/profile/sync": {
+    limit: "write",
+    handler: async (url, req) => saveProfileSync(await readJSONBody(req, 150_000)),
   },
 };
 

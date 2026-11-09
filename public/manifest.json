@@ -1,0 +1,19 @@
+{
+  "name": "Wordly — Daily Puzzle Suite",
+  "short_name": "Wordly",
+  "description": "Nine daily word, crossword, pattern, and logic puzzles that reset every midnight.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#121213",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
