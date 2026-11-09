@@ -151,6 +151,8 @@ def main():
         fh.write("const SUDOKU_PUZZLES = ")
         fh.write(json.dumps(out_bank, separators=(",", ":")))
         fh.write(";\n")
+        fh.write("window.SUDOKU_EPOCH = SUDOKU_EPOCH;\n")
+        fh.write("window.SUDOKU_BANK = SUDOKU_PUZZLES;\n")
 
 
 if __name__ == "__main__":

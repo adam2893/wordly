@@ -618,18 +618,20 @@
       }
     },
   });
-  archiveCtrl = Shared.initArchive({
-    getStatus(d) {
-      const len = state ? state.length : 5;
-      const s = loadDailyState(len, d);
-      if (!s || !s.guesses || !s.guesses.length) return { state: "none", detail: d };
-      if (!s.over) return { state: "progress", detail: `${s.guesses.length} guess${s.guesses.length === 1 ? "" : "es"}` };
-      return { state: s.won ? "won" : "lost", detail: s.won ? `Solved in ${s.guesses.length}` : "Missed" };
-    },
-    onSelectDate(d) {
-      startDaily(state ? state.length : 5, d);
-    },
-  });
+  if (Shared.initArchive) {
+    archiveCtrl = Shared.initArchive({
+      getStatus(d) {
+        const len = state ? state.length : 5;
+        const s = loadDailyState(len, d);
+        if (!s || !s.guesses || !s.guesses.length) return { state: "none", detail: d };
+        if (!s.over) return { state: "progress", detail: `${s.guesses.length} guess${s.guesses.length === 1 ? "" : "es"}` };
+        return { state: s.won ? "won" : "lost", detail: s.won ? `Solved in ${s.guesses.length}` : "Missed" };
+      },
+      onSelectDate(d) {
+        startDaily(state ? state.length : 5, d);
+      },
+    });
+  }
   Shared.onModalClose("result-modal", stopCountdown);
 
   document.getElementById("help-btn").addEventListener("click", () => openModal("help-modal"));

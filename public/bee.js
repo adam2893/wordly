@@ -715,20 +715,22 @@
       if (state && state.mode === "daily" && !els.gate.classList.contains("hidden")) startDaily(state.date);
     },
   });
-  archiveCtrl = S.initArchive({
-    getStatus(d) {
-      const s = S.load(KEYS.daily(d));
-      if (!s || !s.found || !s.found.length) return { state: "none", detail: d };
-      const isGenius = s.maxScore && s.score >= Math.round(0.7 * s.maxScore);
-      return {
-        state: isGenius ? "won" : "progress",
-        detail: `${s.rank || "Played"} · ${s.score || 0} pts`,
-      };
-    },
-    onSelectDate(d) {
-      startDaily(d);
-    },
-  });
+  if (S.initArchive) {
+    archiveCtrl = S.initArchive({
+      getStatus(d) {
+        const s = S.load(KEYS.daily(d));
+        if (!s || !s.found || !s.found.length) return { state: "none", detail: d };
+        const isGenius = s.maxScore && s.score >= Math.round(0.7 * s.maxScore);
+        return {
+          state: isGenius ? "won" : "progress",
+          detail: `${s.rank || "Played"} · ${s.score || 0} pts`,
+        };
+      },
+      onSelectDate(d) {
+        startDaily(d);
+      },
+    });
+  }
   S.wireNameGate(() => startDaily(state && state.date));
 
   let startMode = "daily";

@@ -5,7 +5,9 @@
   "use strict";
 
   const S = Shared;
-  const BANK = window.SUDOKU_BANK || { easy: [], medium: [], hard: [] };
+  const BANK =
+    window.SUDOKU_BANK ||
+    (typeof SUDOKU_PUZZLES !== "undefined" ? SUDOKU_PUZZLES : { easy: [], medium: [], hard: [] });
 
   const KEYS = {
     mode: "sudoku:mode",
@@ -697,21 +699,23 @@
       }
     },
   });
-  archiveCtrl = S.initArchive({
-    getStatus(d) {
-      const diff = (state && state.diff) || getSavedDiff();
-      const s = S.load(KEYS.daily(diff, d));
-      if (!s || (!s.started && !s.over)) return { state: "none", detail: `${DIFF_LABELS[diff]} · ${d}` };
-      if (!s.over) return { state: "progress", detail: `${DIFF_LABELS[diff]} · ${s.filled || 0}/81` };
-      return {
-        state: "won",
-        detail: `${DIFF_LABELS[diff]} · ${S.formatTimer(s.activeMs || 0)}${!s.hints && !s.mistakes ? " ★" : ""}`,
-      };
-    },
-    onSelectDate(d) {
-      startDaily(d, state && state.diff);
-    },
-  });
+  if (S.initArchive) {
+    archiveCtrl = S.initArchive({
+      getStatus(d) {
+        const diff = (state && state.diff) || getSavedDiff();
+        const s = S.load(KEYS.daily(diff, d));
+        if (!s || (!s.started && !s.over)) return { state: "none", detail: `${DIFF_LABELS[diff]} · ${d}` };
+        if (!s.over) return { state: "progress", detail: `${DIFF_LABELS[diff]} · ${s.filled || 0}/81` };
+        return {
+          state: "won",
+          detail: `${DIFF_LABELS[diff]} · ${S.formatTimer(s.activeMs || 0)}${!s.hints && !s.mistakes ? " ★" : ""}`,
+        };
+      },
+      onSelectDate(d) {
+        startDaily(d, state && state.diff);
+      },
+    });
+  }
   S.wireNameGate(() => startDaily(state && state.date, state && state.diff));
 
   let startMode = "daily";

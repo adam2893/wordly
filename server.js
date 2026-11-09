@@ -690,17 +690,28 @@ function serveStatic(req, pathname, res) {
       return;
     }
     const ext = path.extname(filePath).toLowerCase();
+    const etag = `W/"${stat.size}-${Math.floor(stat.mtimeMs)}"`;
     const headers = {
       "Content-Type": MIME[ext] || "application/octet-stream",
       // Revalidate every load so a freshly pulled image shows up right away.
-      "Cache-Control": "no-cache",
+      "Cache-Control": "no-cache, must-revalidate",
       "Last-Modified": stat.mtime.toUTCString(),
+      ETag: etag,
     };
-    const since = Date.parse(req.headers["if-modified-since"] || "");
-    if (Number.isFinite(since) && Math.floor(stat.mtimeMs / 1000) * 1000 <= since) {
-      res.writeHead(304, headers);
-      res.end();
-      return;
+    const inm = req.headers["if-none-match"];
+    if (inm) {
+      if (inm === etag) {
+        res.writeHead(304, headers);
+        res.end();
+        return;
+      }
+    } else {
+      const since = Date.parse(req.headers["if-modified-since"] || "");
+      if (Number.isFinite(since) && Math.floor(stat.mtimeMs / 1000) * 1000 <= since) {
+        res.writeHead(304, headers);
+        res.end();
+        return;
+      }
     }
     fs.readFile(filePath, (err, data) => {
       if (err) {

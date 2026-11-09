@@ -540,21 +540,23 @@
       if (state && state.mode === "daily" && !els.gate.classList.contains("hidden")) startDaily(state.date);
     },
   });
-  archiveCtrl = S.initArchive({
-    epoch: CONNECTIONS_EPOCH,
-    getStatus(d) {
-      const s = S.load(KEYS.daily(d));
-      if (!s || (!s.started && !s.over)) return { state: "none", detail: d };
-      if (!s.over) return { state: "progress", detail: `${(s.solved || []).length}/4 groups` };
-      return {
-        state: s.won ? "won" : "lost",
-        detail: s.won ? `Solved · ${s.mistakes} mistake${s.mistakes === 1 ? "" : "s"}` : `${(s.solved || []).length}/4 groups`,
-      };
-    },
-    onSelectDate(d) {
-      startDaily(d);
-    },
-  });
+  if (S.initArchive) {
+    archiveCtrl = S.initArchive({
+      epoch: CONNECTIONS_EPOCH,
+      getStatus(d) {
+        const s = S.load(KEYS.daily(d));
+        if (!s || (!s.started && !s.over)) return { state: "none", detail: d };
+        if (!s.over) return { state: "progress", detail: `${(s.solved || []).length}/4 groups` };
+        return {
+          state: s.won ? "won" : "lost",
+          detail: s.won ? `Solved · ${s.mistakes} mistake${s.mistakes === 1 ? "" : "s"}` : `${(s.solved || []).length}/4 groups`,
+        };
+      },
+      onSelectDate(d) {
+        startDaily(d);
+      },
+    });
+  }
   S.wireNameGate(() => startDaily(state && state.date));
 
   let startMode = "daily";

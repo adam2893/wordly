@@ -697,17 +697,19 @@
       if (state && state.mode === "daily" && !els.gate.classList.contains("hidden")) startDaily(state.date);
     },
   });
-  archiveCtrl = S.initArchive({
-    getStatus(d) {
-      const s = S.load(KEYS.daily(d));
-      if (!s || (!s.started && !s.solved)) return { state: "none", detail: d };
-      if (!s.solved) return { state: "progress", detail: "In progress" };
-      return { state: "won", detail: `Solved in ${(s.words || []).length} words` };
-    },
-    onSelectDate(d) {
-      startDaily(d);
-    },
-  });
+  if (S.initArchive) {
+    archiveCtrl = S.initArchive({
+      getStatus(d) {
+        const s = S.load(KEYS.daily(d));
+        if (!s || (!s.started && !s.solved)) return { state: "none", detail: d };
+        if (!s.solved) return { state: "progress", detail: "In progress" };
+        return { state: "won", detail: `Solved in ${(s.words || []).length} words` };
+      },
+      onSelectDate(d) {
+        startDaily(d);
+      },
+    });
+  }
   S.wireNameGate(() => startDaily(state && state.date));
 
   let startMode = "daily";

@@ -19,47 +19,76 @@
   const BITMASKS = [0b111, 0b111 << 3, 0b111 << 6];
   const MAX_COMBO = (NUM_TILES * NUM_LAYERS) / 2; // 45
 
+  // Distinct per-variation geometry for each layer (0 = outer plaque,
+  // 1 = middle motif, 2 = center emblem) so every variation pairs a unique
+  // shape with a unique color (WCAG 1.4.1).
+  function renderLayerShape(layer, variation, color) {
+    const idx = (variation - 1) % NUM_VARIATIONS;
+    if (layer === 0) {
+      switch (idx) {
+        case 0:
+          return `<rect x="8" y="8" width="84" height="84" rx="22" fill="${color}" opacity="0.92"/><rect x="14" y="14" width="72" height="72" rx="17" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="2.4"/>`;
+        case 1:
+          return `<polygon points="30,8 70,8 92,30 92,70 70,92 30,92 8,70 8,30" fill="${color}" opacity="0.92"/><polygon points="33,14 67,14 86,33 86,67 67,86 33,86 14,67 14,33" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="2.2"/>`;
+        case 2:
+          return `<circle cx="50" cy="50" r="42" fill="${color}" opacity="0.92"/><circle cx="50" cy="50" r="35" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.4" stroke-dasharray="7 5"/>`;
+        case 3:
+          return `<path d="M26,8 H74 V26 H92 V74 H74 V92 H26 V74 H8 V26 H26 Z" fill="${color}" opacity="0.92"/>`;
+        case 4:
+          return `<polygon points="50,5 95,50 50,95 5,50" fill="${color}" opacity="0.92"/><polygon points="50,13 87,50 50,87 13,50" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="2.2"/>`;
+        default:
+          return `<rect x="10" y="10" width="80" height="80" rx="8" fill="${color}" opacity="0.92"/><circle cx="20" cy="20" r="3.5" fill="rgba(255,255,255,0.45)"/><circle cx="80" cy="20" r="3.5" fill="rgba(255,255,255,0.45)"/><circle cx="20" cy="80" r="3.5" fill="rgba(255,255,255,0.45)"/><circle cx="80" cy="80" r="3.5" fill="rgba(255,255,255,0.45)"/>`;
+      }
+    }
+    if (layer === 1) {
+      switch (idx) {
+        case 0:
+          return `<polygon points="50,20 80,50 50,80 20,50" fill="${color}" stroke="rgba(0,0,0,0.34)" stroke-width="2.2"/>`;
+        case 1:
+          return `<polygon points="50,17 60,40 83,50 60,60 50,83 40,60 17,50 40,40" fill="${color}" stroke="rgba(0,0,0,0.34)" stroke-width="2.2"/>`;
+        case 2:
+          return `<rect x="25" y="25" width="50" height="50" rx="12" fill="${color}" stroke="rgba(0,0,0,0.34)" stroke-width="2.2"/>`;
+        case 3:
+          return `<path d="M30,22 L50,38 L70,22 L78,30 L62,50 L78,70 L70,78 L50,62 L30,78 L22,70 L38,50 L22,30 Z" fill="${color}" stroke="rgba(0,0,0,0.34)" stroke-width="2.2"/>`;
+        case 4:
+          return `<polygon points="50,21 76,35.5 76,64.5 50,79 24,64.5 24,35.5" fill="${color}" stroke="rgba(0,0,0,0.34)" stroke-width="2.2"/>`;
+        default:
+          return `<circle cx="50" cy="50" r="24" fill="none" stroke="rgba(0,0,0,0.38)" stroke-width="12"/><circle cx="50" cy="50" r="24" fill="none" stroke="${color}" stroke-width="9"/>`;
+      }
+    }
+    switch (idx) {
+      case 0:
+        return `<circle cx="50" cy="50" r="12" fill="${color}" stroke="rgba(0,0,0,0.45)" stroke-width="2.2"/>`;
+      case 1:
+        return `<polygon points="50,35 65,50 50,65 35,50" fill="${color}" stroke="rgba(0,0,0,0.45)" stroke-width="2.2"/>`;
+      case 2:
+        return `<path d="M45,36 H55 V45 H64 V55 H55 V64 H45 V55 H36 V45 H45 Z" fill="${color}" stroke="rgba(0,0,0,0.45)" stroke-width="2"/>`;
+      case 3:
+        return `<polygon points="50,35 65,61 35,61" fill="${color}" stroke="rgba(0,0,0,0.45)" stroke-width="2.2"/>`;
+      case 4:
+        return `<rect x="38" y="38" width="24" height="24" rx="5" fill="${color}" stroke="rgba(0,0,0,0.45)" stroke-width="2.2"/>`;
+      default:
+        return `<circle cx="50" cy="50" r="11" fill="#ffffff" stroke="rgba(0,0,0,0.45)" stroke-width="2"/><circle cx="50" cy="50" r="6.5" fill="${color}"/>`;
+    }
+  }
+
   // Visual motif palettes rotated deterministically by date/seed.
   const MOTIFS = [
     {
-      name: "Squircle Pebbles",
-      colors: ["#d62b72", "#24b576", "#6d4ad7", "#e6a80b", "#25cbcb", "#ff6b35"],
-      shape: (l, c) => {
-        if (l === 0) return `<rect x="10" y="10" width="80" height="80" rx="26" fill="${c}" opacity="0.88"/>`;
-        if (l === 1) return `<rect x="25" y="25" width="50" height="50" rx="16" fill="${c}"/>`;
-        return `<circle cx="50" cy="50" r="13" fill="${c}" stroke="rgba(0,0,0,0.22)" stroke-width="2"/>`;
-      },
+      name: "Mosaic Jewel",
+      colors: ["#e63976", "#24b576", "#7b52e3", "#f2b705", "#1fb8d4", "#ff6b35"],
     },
     {
-      name: "Azulejo Diamonds",
-      colors: ["#2ec4b6", "#e71d36", "#ff9f1c", "#7209b7", "#3a86ff", "#8ac926"],
-      shape: (l, c) => {
-        if (l === 0) return `<polygon points="50,6 94,50 50,94 6,50" fill="${c}" opacity="0.88"/>`;
-        if (l === 1) return `<rect x="27" y="27" width="46" height="46" rx="8" fill="${c}"/>`;
-        return `<polygon points="50,33 67,50 50,67 33,50" fill="${c}" stroke="rgba(0,0,0,0.22)" stroke-width="2"/>`;
-      },
+      name: "Azulejo Lisbon",
+      colors: ["#2ec4b6", "#e71d36", "#ff9f1c", "#8338ec", "#3a86ff", "#8ac926"],
     },
     {
-      name: "Bauhaus Rings",
+      name: "Bauhaus Studio",
       colors: ["#f72585", "#4cc9f0", "#f8961e", "#43aa8b", "#7209b7", "#f9c74f"],
-      shape: (l, c) => {
-        if (l === 0) return `<circle cx="50" cy="50" r="41" fill="none" stroke="${c}" stroke-width="12"/>`;
-        if (l === 1) return `<polygon points="50,21 77,69 23,69" fill="${c}"/>`;
-        return `<circle cx="50" cy="53" r="12" fill="${c}" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>`;
-      },
     },
     {
-      name: "Origami Petals",
-      colors: ["#ff595e", "#ffca3a", "#8ac926", "#1982c4", "#6a4c93", "#ff924c"],
-      shape: (l, c) => {
-        if (l === 0) {
-          return `<path d="M50 8 C72 8 92 28 92 50 C92 72 72 92 50 92 C28 92 8 72 8 50 C8 28 28 8 50 8 Z" fill="${c}" opacity="0.86"/>`;
-        }
-        if (l === 1) {
-          return `<polygon points="50,18 61,39 82,50 61,61 50,82 39,61 18,50 39,39" fill="${c}"/>`;
-        }
-        return `<rect x="38" y="38" width="24" height="24" rx="6" transform="rotate(45 50 50)" fill="${c}" stroke="rgba(0,0,0,0.22)" stroke-width="2"/>`;
-      },
+      name: "Kyoto Origami",
+      colors: ["#ff595e", "#ffca3a", "#8ac926", "#1982c4", "#9b5de5", "#ff924c"],
     },
   ];
 
@@ -367,7 +396,7 @@
       layers.forEach((v, l) => {
         if (v > 0) {
           const color = motif.colors[(v - 1) % motif.colors.length];
-          svgInner += `<g class="tiles-layer l${l}">${motif.shape(l, color)}</g>`;
+          svgInner += `<g class="tiles-layer l${l}">${renderLayerShape(l, v, color)}</g>`;
         }
       });
 
@@ -539,20 +568,22 @@
       if (state && state.mode === "daily" && !els.gate.classList.contains("hidden")) startDaily(state.date);
     },
   });
-  archiveCtrl = S.initArchive({
-    getStatus(d) {
-      const s = S.load(KEYS.daily(d));
-      if (!s || (!s.started && !s.over)) return { state: "none", detail: d };
-      if (!s.over) return { state: "progress", detail: `${s.cleared || 0}/30 cleared` };
-      return {
-        state: "won",
-        detail: `${s.bestCombo || 0}/${MAX_COMBO} combo${s.errors === 0 && s.bestCombo >= MAX_COMBO ? " ★" : ""}`,
-      };
-    },
-    onSelectDate(d) {
-      startDaily(d);
-    },
-  });
+  if (S.initArchive) {
+    archiveCtrl = S.initArchive({
+      getStatus(d) {
+        const s = S.load(KEYS.daily(d));
+        if (!s || (!s.started && !s.over)) return { state: "none", detail: d };
+        if (!s.over) return { state: "progress", detail: `${s.cleared || 0}/30 cleared` };
+        return {
+          state: "won",
+          detail: `${s.bestCombo || 0}/${MAX_COMBO} combo${s.errors === 0 && s.bestCombo >= MAX_COMBO ? " ★" : ""}`,
+        };
+      },
+      onSelectDate(d) {
+        startDaily(d);
+      },
+    });
+  }
   S.wireNameGate(() => startDaily(state && state.date));
 
   let startMode = "daily";

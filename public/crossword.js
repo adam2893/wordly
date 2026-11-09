@@ -270,12 +270,14 @@
 
   function showGate() {
     els.game.classList.add("hidden");
+    if (els.keyboard && els.keyboard.parentElement) els.keyboard.parentElement.classList.add("hidden");
     els.gate.classList.remove("hidden");
     document.getElementById("gate-name-input").value = "";
   }
 
   function hideGate() {
     els.game.classList.remove("hidden");
+    if (els.keyboard && els.keyboard.parentElement) els.keyboard.parentElement.classList.remove("hidden");
     els.gate.classList.add("hidden");
   }
 
@@ -895,21 +897,23 @@
       if (state && state.mode === "daily" && !els.gate.classList.contains("hidden")) startDaily(state.date);
     },
   });
-  archiveCtrl = S.initArchive({
-    epoch: CFG.epoch,
-    getStatus(d) {
-      const s = S.load(KEYS.daily(d));
-      if (!s || (!s.started && !s.over)) return { state: "none", detail: d };
-      if (!s.over) return { state: "progress", detail: `${s.filled || 0}/${s.total || ""} filled` };
-      return {
-        state: "won",
-        detail: `${S.formatTimer(s.activeMs || 0)}${s.hints ? ` · ${s.hints} hint${s.hints === 1 ? "" : "s"}` : " ★"}`,
-      };
-    },
-    onSelectDate(d) {
-      startDaily(d);
-    },
-  });
+  if (S.initArchive) {
+    archiveCtrl = S.initArchive({
+      epoch: CFG.epoch,
+      getStatus(d) {
+        const s = S.load(KEYS.daily(d));
+        if (!s || (!s.started && !s.over)) return { state: "none", detail: d };
+        if (!s.over) return { state: "progress", detail: `${s.filled || 0}/${s.total || ""} filled` };
+        return {
+          state: "won",
+          detail: `${S.formatTimer(s.activeMs || 0)}${s.hints ? ` · ${s.hints} hint${s.hints === 1 ? "" : "s"}` : " ★"}`,
+        };
+      },
+      onSelectDate(d) {
+        startDaily(d);
+      },
+    });
+  }
   S.wireNameGate(() => startDaily(state && state.date));
 
   let startMode = "daily";

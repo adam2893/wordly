@@ -383,6 +383,13 @@ window.Shared = (() => {
 
     let savedTheme = null;
     try {
+      const params = new URLSearchParams(location.search);
+      const qPlayer = params.get("player");
+      if (qPlayer && qPlayer.trim()) setPlayerName(qPlayer.trim().slice(0, 40));
+      const qTheme = params.get("theme");
+      if (qTheme && THEMES.some((t) => t.id === qTheme)) {
+        localStorage.setItem(THEME_KEY, qTheme);
+      }
       savedTheme = localStorage.getItem(THEME_KEY);
     } catch {
       // ignore
