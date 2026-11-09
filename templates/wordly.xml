@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <Container version="2">
   <Name>Wordly</Name>
-  <Repository>ghcr.io/jakeshake/wordly:latest</Repository>
-  <Registry>https://github.com/jakeshake/wordly/pkgs/container/wordly</Registry>
+  <Repository>ghcr.io/adam2893/wordly:latest</Repository>
+  <Registry>https://github.com/adam2893/wordly/pkgs/container/wordly</Registry>
   <Network>bridge</Network>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
-  <Icon>https://raw.githubusercontent.com/jakeshake/wordly/main/icon.png</Icon>
+  <Icon>https://raw.githubusercontent.com/adam2893/wordly/main/icon.png</Icon>
   <WebUI>http://[IP]:[PORT:80]/</WebUI>
-  <Overview>Self-hosted daily word games with shared leaderboards: Wordly (guess the 5 or 6 letter word), Spelly Bee (make words from seven letters), Boxy Letters (chain words around a square) and Connecty (sort sixteen words into four groups). Everyone on your server gets the same daily puzzles, plus practice mode, a timer, and 19 themes. Mobile-friendly, no accounts: players just pick a name. Map /data to appdata so leaderboards survive updates.</Overview>
-  <Project>https://github.com/jakeshake/wordly</Project>
-  <Support>https://github.com/jakeshake/wordly/issues</Support>
-  <TemplateURL>https://raw.githubusercontent.com/jakeshake/wordly/main/templates/wordly.xml</TemplateURL>
-  <ReadMe>https://raw.githubusercontent.com/jakeshake/wordly/main/README.md</ReadMe>
+  <Overview>Self-hosted daily word and logic games with shared leaderboards: Wordly (guess the 5 or 6 letter word), Spelly Bee (make words from seven letters), Boxy Letters (chain words around a square), Connecty (sort sixteen words into four groups), Mini Crossy &amp; Crossy (daily crosswords), Tiley (layered tile matching), and Sudoky (daily Easy/Medium/Hard Sudoku). Everyone on your server gets the same daily puzzles, plus a past-days archive, practice mode, a timer, and 19 themes. Mobile-friendly, no accounts: players just pick a name. Map /data to appdata so leaderboards survive updates.</Overview>
+  <Project>https://github.com/adam2893/wordly</Project>
+  <Support>https://github.com/adam2893/wordly/issues</Support>
+  <TemplateURL>https://raw.githubusercontent.com/adam2893/wordly/main/templates/wordly.xml</TemplateURL>
+  <ReadMe>https://raw.githubusercontent.com/adam2893/wordly/main/README.md</ReadMe>
   <DonateText>Enjoying Wordly? Buy me a coffee</DonateText>
   <DonateLink>https://buymeacoffee.com/jakeshake</DonateLink>
   <Category>Other:</Category>

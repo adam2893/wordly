@@ -2,6 +2,11 @@
 
 <img src="icon.png" alt="Wordly icon" width="96" align="right">
 
+[![Build and publish Docker image](https://github.com/adam2893/wordly/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/adam2893/wordly/actions/workflows/docker-publish.yml)
+[![GHCR Package](https://img.shields.io/badge/ghcr.io-adam2893%2Fwordly%3Alatest-blue?logo=docker)](https://github.com/adam2893/wordly/pkgs/container/wordly)
+
+**Docker image:** [`ghcr.io/adam2893/wordly:latest`](https://github.com/adam2893/wordly/pkgs/container/wordly) (`docker pull ghcr.io/adam2893/wordly:latest`)
+
 A small, self-hosted collection of daily word and logic games: **Wordly** (guess the 5 or 6 letter word), **Spelly Bee**, **Boxy Letters**, **Connecty**, **Mini Crossy**, **Crossy**, **Tiley**, and **Sudoky**. Mobile-friendly, no accounts, shared leaderboards for everyone on your server, plus a **Daily Archive** (📅) to catch up on any past day you missed. The home page (`/`) is a game menu showing today's progress in each game, and every game shares the same themes, player name, and leaderboard backend.
 
 ## Play against your family and friends
@@ -134,16 +139,22 @@ powershell -File .devserver/serve.ps1 -Port 5173
 
 ## Docker / Unraid
 
-A `Dockerfile` (Node 20 alpine) and a GitHub Actions workflow (`.github/workflows/docker-publish.yml`) are included. Every push to `main` builds, smoke-tests, and publishes a multi-arch image to GitHub Container Registry at:
+A `Dockerfile` (Node 20 alpine) and a GitHub Actions workflow ([`.github/workflows/docker-publish.yml`](.github/workflows/docker-publish.yml)) are included. Every push to `main` builds, smoke-tests, and publishes a multi-arch (`linux/amd64`, `linux/arm64`) image to [GitHub Container Registry](https://github.com/adam2893/wordly/pkgs/container/wordly) at:
 
 ```
-ghcr.io/jakeshake/wordly:latest
+ghcr.io/adam2893/wordly:latest
+```
+
+Quick run with Docker:
+
+```bash
+docker run -d --name wordly -p 8080:80 -v wordly-data:/data ghcr.io/adam2893/wordly:latest
 ```
 
 To run it on Unraid:
 
 1. **Docker tab → Add Container.**
-2. **Repository**: `ghcr.io/jakeshake/wordly:latest`
+2. **Repository**: `ghcr.io/adam2893/wordly:latest`
 3. **Port**: map container port `80` to whatever host port you want (e.g. `8080`).
 4. **Path**: map container path `/data` to a host appdata folder (e.g. `/mnt/user/appdata/wordly`) — **this is what makes the leaderboard persist** across container restarts/updates. Without it, scores reset every time the container is recreated.
 5. Apply — Unraid pulls the image and starts it. Visit `http://<unraid-ip>:8080`.
@@ -206,7 +217,7 @@ Wordly is listed in Unraid's Community Applications (search for **Wordly** in th
 
 ## Versions
 
-Every push to `main` publishes `ghcr.io/jakeshake/wordly:latest`. Release tags (`v1.0.0`, ...) also publish `:1.0.0` and `:1.0`, so you can pin a version.
+Every push to `main` publishes [`ghcr.io/adam2893/wordly:latest`](https://github.com/adam2893/wordly/pkgs/container/wordly). Release tags (`v1.0.0`, ...) also publish `:1.0.0` and `:1.0`, so you can pin a version.
 
 ## Credits
 

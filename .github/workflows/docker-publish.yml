@@ -28,6 +28,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -67,6 +70,10 @@ jobs:
           curl -sf http://localhost:8080/bee | grep -q "bee.js" || (echo "/bee page missing" && exit 1)
           curl -sf http://localhost:8080/boxed | grep -q "boxed.js" || (echo "/boxed page missing" && exit 1)
           curl -sf http://localhost:8080/connections | grep -q "connections.js" || (echo "/connections page missing" && exit 1)
+          curl -sf http://localhost:8080/mini | grep -q "crossword.js" || (echo "/mini page missing" && exit 1)
+          curl -sf http://localhost:8080/crossword | grep -q "crossword.js" || (echo "/crossword page missing" && exit 1)
+          curl -sf http://localhost:8080/tiles | grep -q "tiles.js" || (echo "/tiles page missing" && exit 1)
+          curl -sf http://localhost:8080/sudoku | grep -q "sudoku.js" || (echo "/sudoku page missing" && exit 1)
           curl -sf -H "Accept-Encoding: gzip" -o /dev/null -D - http://localhost:8080/words-boxed.js | grep -qi "content-encoding: gzip" || (echo "large assets not gzipped" && exit 1)
 
           echo "Submitting a test score with time and luck..."
@@ -106,6 +113,24 @@ jobs:
           echo "$CON" | grep -q '"solved":true' || (echo "connections submit unexpected: $CON" && exit 1)
           CLB=$(curl -sf "http://localhost:8080/api/connections/leaderboard?date=2020-01-01")
           echo "$CLB" | grep -q '"perfect":1' || (echo "connections leaderboard unexpected: $CLB" && exit 1)
+
+          echo "Mini, Crossword, Tiley & Sudoky scores + leaderboards..."
+          MINI=$(curl -sf -X POST http://localhost:8080/api/mini/score \
+            -H "Content-Type: application/json" \
+            -d '{"name":"ci-smoke-test","date":"2020-01-01","hints":0,"timeMs":42000}')
+          echo "$MINI" | grep -q '"hints":0' || (echo "mini submit unexpected: $MINI" && exit 1)
+          CW=$(curl -sf -X POST http://localhost:8080/api/crossword/score \
+            -H "Content-Type: application/json" \
+            -d '{"name":"ci-smoke-test","date":"2020-01-01","hints":1,"timeMs":320000}')
+          echo "$CW" | grep -q '"hints":1' || (echo "crossword submit unexpected: $CW" && exit 1)
+          TIL=$(curl -sf -X POST http://localhost:8080/api/tiles/score \
+            -H "Content-Type: application/json" \
+            -d '{"name":"ci-smoke-test","date":"2020-01-01","bestCombo":45,"maxCombo":45,"errors":0,"timeMs":70000}')
+          echo "$TIL" | grep -q '"bestCombo":45' || (echo "tiles submit unexpected: $TIL" && exit 1)
+          SUD=$(curl -sf -X POST http://localhost:8080/api/sudoku/score \
+            -H "Content-Type: application/json" \
+            -d '{"name":"ci-smoke-test","date":"2020-01-01","difficulty":"easy","mistakes":0,"hints":0,"timeMs":95000}')
+          echo "$SUD" | grep -q '"difficulty":"easy"' || (echo "sudoku submit unexpected: $SUD" && exit 1)
 
           echo "Rate limiting kicks in on score spam..."
           CODE=200
