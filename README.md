@@ -9,6 +9,23 @@
 
 A small, self-hosted collection of 11 daily word and logic games: **Wordly** (guess the 5 or 6 letter word, with optional **Hard Mode\*** and high-contrast recessed eliminated keys), **Spelly Bee**, **Boxy Letters**, **Connecty**, **Strandy** (6×8 themed word trails + Spangram), **Searchy** (Easy 8×8, Medium 10×10 & Hard 12×12 themed word searches), **Mini Crossy** (5×5), **Midi Crossy** (9×9–11×11), **Crossy** (Monday/Tuesday NYT 15×15), **Tiley**, and **Sudoky**. Phone-first and installable as a **PWA** with 100% offline play (pre-caches all 11 games + automatic offline score queue), accidental-zoom protection, **20 themes** (including **OLED Black**), cross-device profile sync, shared leaderboards for everyone on your server, and a **Daily Archive** (📅) to catch up on any past day you missed. The home page (`/`) is a game menu showing today's progress in each game plus a 1-click **Daily Recap** share button.
 
+## What's New in This Fork (`adam2893/wordly`)
+
+This repository is an expanded fork of [**jakeshake/wordly**](https://github.com/jakeshake/wordly) (which created the original **Wordly**, **Spelly Bee**, **Boxy Letters**, **Connecty**, and zero-dependency server/theme architecture). On top of upstream, this fork adds:
+
+- **7 New Daily & Practice Games:**
+  - **Strandy (`/strands`)** — 6×8 themed word-trail grids with a board-spanning **Spangram** (`🟡`) and **Theme Words** (`🔵`).
+  - **Searchy (`/wordsearch`)** — deterministic offline themed **Word Search** across **Easy (8×8)**, **Medium (10×10)**, and **Hard (12×12)** grids.
+  - **Mini Crossy (`/mini`)** — bite-sized 5×5 daily crosswords.
+  - **Midi Crossy (`/midi`)** — mid-sized 8×8–11×11 daily crosswords, with a header switcher (`Mini | Midi | Full`) shared across all three crossword modes.
+  - **Crossy (`/crossword`)** — full 15×15 daily crosswords curated from approachable **Monday & Tuesday New York Times** puzzles, with `(N)` word-length badges on every clue.
+  - **Tiley (`/tiles`)** — 30-tile layered pattern-matching combo game with 4 daily visual styles.
+  - **Sudoky (`/sudoku`)** — **Easy**, **Medium**, and **Hard** 9×9 logic grids with pencil-mark notes, auto-clearing candidates, and undo.
+- **100% Offline Phone PWA (`sw.js`):** pre-caches all 11 games, JS engines, and word banks on first visit so every puzzle loads in airplane mode or on the subway, plus an automatic **offline score queue** that syncs to the leaderboard as soon as your connection returns.
+- **Phone-First Ergonomics & High-Contrast Keyboard:** recessed/dimmed eliminated keys in Wordly so used letters never blend in with unused keys, optional **Hard Mode (`*`)**, anti-zoom touch handling, and **OLED Black** (`#000000`) theme.
+- **30-Day Daily Archive (`📅`), Emoji Shares & Cross-Device Sync (`👤`):** play any missed daily puzzle from the past 30 days, share spoiler-free emoji grids (`🟩🟨⬛`, `🔵🟡💡`) or a combined **Daily Recap**, and sync progress across phone, tablet, and desktop via PIN or backup code.
+- **Automated Multi-Arch GHCR Releases:** GitHub Actions workflow publishing `ghcr.io/adam2893/wordly:latest` (`linux/amd64` + `linux/arm64`) on every push to `main`.
+
 ## Play against your family and friends
 
 The big difference from the NYT games: **everyone on your server plays the same daily puzzles and lands on the same leaderboard.** Challenge your spouse, kids, or friends, compare today's results, and see who's ahead over weeks of streaks, win rates, average guesses, and best times. Each game has its own board, with a **Today** view and an **All-time** view.
@@ -127,10 +144,10 @@ A few of the themes: Forest, Bubblegum 3D, Synthwave and Ocean. Pick yours with 
 
 Frontend is plain HTML/CSS/JS (`public/`), no build step, no framework. It's paired with a small zero-dependency Node backend (`server.js`, built-in `http`/`fs` only — no `npm install`, no `package.json`) that does two things:
 
-1. Serves the static frontend (gzip-compressed for text assets, with clean URLs like `/bee` → `bee.html`).
-2. Stores and aggregates leaderboard scores as JSON files in the data directory (`scores.json` for Wordly, `bee.json`, `boxed.json`, `connections.json`), so results submitted from any device/browser are visible to everyone.
+1. Serves the static frontend (gzip-compressed for text assets, with clean URLs like `/bee` → `bee.html`, `/wordsearch` → `wordsearch.html`, `/midi` → `midi.html`, etc.).
+2. Stores and aggregates leaderboard scores and synced player profiles as JSON files in the data directory (`scores.json` for Wordly, `bee.json`, `boxed.json`, `connections.json`, `strands.json`, `wordsearch.json`, `mini.json`, `midi.json`, `crossword.json`, `tiles.json`, `sudoku.json`, and `profiles.json`), so results submitted from any device/browser are visible to everyone.
 
-Shared frontend code (themes, player name, modals, dates, seeded RNG, stopwatch) lives in `public/common.js`; each game has its own `*.html` + `*.js`, with Spelly Bee / Boxy Letters / Connecty styles in `public/games.css`.
+Shared frontend code (themes, player name, cross-device profile sync, offline score queue, daily archive modal, dates, seeded RNG, stopwatch) lives in `public/common.js`; each game has its own `*.html` + `*.js` (with Mini, Midi, and Full Crossy sharing `public/crossword.js`), and game-specific styles live in `public/games.css`.
 
 ### Rate limiting
 
@@ -212,6 +229,13 @@ Wordly:
 - **Valid guesses** (`GUESSES[5]`, `GUESSES[6]` in `public/words.js`): a large Scrabble-style word-game dictionary (ENABLE word list), ~8.6k five-letter and ~15.2k six-letter words. This is what guesses are checked against, so legitimate everyday words are essentially never rejected.
 - **Possible answers** (`ANSWERS[5]`, `ANSWERS[6]`): the curated common-word lists from the original build — a curated 2,314-word list of common words for 5 letters, and a manually-screened ~1,233-word list for 6 letters. Daily and Practice answers are always picked from here, so the puzzle stays solvable/fair. `ANSWERS` is a subset of `GUESSES`, guaranteed at build time.
 
+Additional puzzle banks generated by scripts in `tools/`:
+
+- **Strandy** (`public/words-strands.js`, built by `tools/build_strands.py`): 140+ pre-packed 6×8 word-trail boards where every cell belongs to a theme word or the board-spanning Spangram.
+- **Searchy** (`public/words-wordsearch.js`, built by `tools/build_wordsearch.py`): 141 curated themed word lists (10 words each, 4–8 letters) placed deterministically on-device into 8×8, 10×10, or 12×12 grids.
+- **Mini Crossy, Midi Crossy & Crossy** (`public/words-mini.js`, `public/words-midi.js`, `public/words-crossword.js`, built by `tools/build_crosswords.py`): 365 5×5 Mini puzzles and 148 8×8–11×11 Midi puzzles from Crosshare, plus 200 classic Monday & Tuesday 15×15 NYT crosswords (filtered for standard numbering and zero rebus/cryptic gimmicks).
+- **Sudoky** (`public/words-sudoku.js`, built by `tools/build_sudoku.py`): 450 pre-solved Easy, Medium, and Hard 9×9 Sudoku boards.
+
 ## Customizing
 
 - **Add a theme**: add a `[data-theme="yourname"]` block in `public/style.css` with the same CSS custom properties as the existing themes, then add `{ id, name, swatch }` to the `THEMES` array at the top of `public/common.js`. Optionally set `--bee-center` / `--bee-center-text` if the theme's `--color-present` doesn't stand out as the Spelly Bee center hex.
@@ -240,14 +264,20 @@ Wordly is listed in Unraid's Community Applications (search for **Wordly** in th
 
 Every push to `main` publishes [`ghcr.io/adam2893/wordly:latest`](https://github.com/adam2893/wordly/pkgs/container/wordly). Release tags (`v1.0.0`, ...) also publish `:1.0.0` and `:1.0`, so you can pin a version.
 
-## Credits
+## Credits & Acknowledgments
 
-- Word data: [ENABLE](https://github.com/dolph/dictionary) (public domain), [wordfreq](https://github.com/rspeer/wordfreq), [SCOWL](http://wordlist.aspell.net/), [lemminflect](https://github.com/bjascob/LemmInflect), the [LDNOOBW](https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words) list, crossword puzzles from [Crosshare](https://crosshare.org), Tiles mechanics from [baldoalessandro/tiles_game](https://github.com/baldoalessandro/tiles_game), and Sudoku puzzles from [TN1ck/super-sudoku](https://github.com/TN1ck/super-sudoku).
-- Several theme backgrounds are wallpapers collected from the web. If you own one of them and want it credited or removed, please [open an issue](https://github.com/jakeshake/wordly/issues) and it will be taken care of promptly.
-- Wordly is an independent project and is not affiliated with or endorsed by The New York Times.
+- **Original Wordly project**: Forked from [**jakeshake/wordly**](https://github.com/jakeshake/wordly) by [@jakeshake](https://github.com/jakeshake) — creator of the original self-hosted Wordly, Spelly Bee, Boxy Letters, and Connecty suite, the zero-dependency Node server, and the theme artwork system ([Buy Jacob a coffee](https://buymeacoffee.com/jakeshake)).
+- **Crosswords (`Mini Crossy`, `Midi Crossy` & `Crossy`)**:
+  - Mini (5×5) and Midi (8×8–11×11) puzzles sourced from community constructors on [**Crosshare**](https://crosshare.org) (constructor credit is displayed in the byline of every puzzle).
+  - Full 15×15 Monday & Tuesday crosswords sourced from the historical archive compiled in [**doshea/nyt_crosswords**](https://github.com/doshea/nyt_crosswords) (with individual constructor credits preserved in each puzzle's byline).
+- **Tiley (`/tiles`)**: Inspired by and adapted from [**baldoalessandro/tiles_game**](https://github.com/baldoalessandro/tiles_game) by [@baldoalessandro](https://github.com/baldoalessandro).
+- **Sudoky (`/sudoku`)**: 9×9 Easy, Medium, and Hard puzzle bank adapted from [**TN1ck/super-sudoku**](https://github.com/TN1ck/super-sudoku) by [@TN1ck](https://github.com/TN1ck).
+- **Searchy (`/wordsearch`)**: Inspired by [**apiverve/wordsearch-api**](https://github.com/apiverve/wordsearch-api).
+- **UI/UX & Polish**: Guided by design and interaction skills from [**jakubkrehel/skills**](https://github.com/jakubkrehel/skills) and [**pbakaus/impeccable**](https://github.com/pbakaus/impeccable).
+- **Dictionaries & Word Data**: [ENABLE](https://github.com/dolph/dictionary) (public domain), [wordfreq](https://github.com/rspeer/wordfreq), [SCOWL](http://wordlist.aspell.net/), [lemminflect](https://github.com/bjascob/LemmInflect), the [LDNOOBW](https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words) blocklist, and community Spelling Bee archives ([tedmiston/spelling-bee-answers](https://github.com/tedmiston/spelling-bee-answers), [philshem/scrape_bee](https://github.com/philshem/scrape_bee), [bwillenbring/nytimes-bee](https://github.com/bwillenbring/nytimes-bee)).
+- **Theme Backgrounds**: Several theme backgrounds are wallpapers collected from the web. If you own one of them and want it credited or removed, please [open an issue](https://github.com/adam2893/wordly/issues) and it will be taken care of promptly.
+- Wordly is an independent self-hosted project and is not affiliated with or endorsed by The New York Times.
 
 ## License
 
 [MIT](LICENSE)
-
-If you enjoy Wordly, you can [buy me a coffee](https://buymeacoffee.com/jakeshake).

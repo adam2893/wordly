@@ -8,17 +8,17 @@
   <Privileged>false</Privileged>
   <Icon>https://raw.githubusercontent.com/adam2893/wordly/main/icon.png</Icon>
   <WebUI>http://[IP]:[PORT:80]/</WebUI>
-  <Overview>Self-hosted daily word and logic games with shared leaderboards: Wordly (guess the 5 or 6 letter word), Spelly Bee (make words from seven letters), Boxy Letters (chain words around a square), Connecty (sort sixteen words into four groups), Mini Crossy &amp; Crossy (daily crosswords), Tiley (layered tile matching), and Sudoky (daily Easy/Medium/Hard Sudoku). Everyone on your server gets the same daily puzzles, plus a past-days archive, practice mode, a timer, and 19 themes. Mobile-friendly, no accounts: players just pick a name. Map /data to appdata so leaderboards survive updates.</Overview>
+  <Overview>Self-hosted collection of 11 daily word and logic games with shared leaderboards and 100% offline phone PWA support: Wordly (5 or 6 letter word + Hard Mode), Spelly Bee, Boxy Letters, Connecty, Strandy (6x8 word trails + Spangram), Searchy (Easy/Med/Hard word search), Mini Crossy (5x5), Midi Crossy (8x8-11x11), Crossy (Monday/Tuesday NYT 15x15), Tiley (layered tile matching), and Sudoky (Easy/Medium/Hard 9x9 Sudoku). Includes a 30-day archive for missed days, practice mode, cross-device profile sync, emoji shares, and 20 themes (including OLED Black). Map /data to appdata so leaderboards survive updates.</Overview>
   <Project>https://github.com/adam2893/wordly</Project>
   <Support>https://github.com/adam2893/wordly/issues</Support>
   <TemplateURL>https://raw.githubusercontent.com/adam2893/wordly/main/templates/wordly.xml</TemplateURL>
   <ReadMe>https://raw.githubusercontent.com/adam2893/wordly/main/README.md</ReadMe>
-  <DonateText>Enjoying Wordly? Buy me a coffee</DonateText>
+  <DonateText>Enjoying Wordly? Buy Jacob (original creator) a coffee</DonateText>
   <DonateLink>https://buymeacoffee.com/jakeshake</DonateLink>
   <Category>Other:</Category>
-  <ExtraSearchTerms>word game puzzle daily guess anagram hive family leaderboard</ExtraSearchTerms>
-  <Changes>### 1.0.0
-Initial release: Wordly, Spelly Bee, Boxy Letters and Connecty with daily and practice modes, leaderboards and 19 themes.</Changes>
+  <ExtraSearchTerms>word game puzzle daily wordle strands wordsearch crossword sudoku tiles family leaderboard offline pwa</ExtraSearchTerms>
+  <Changes>### Latest
+Expanded to 11 daily &amp; practice games (Wordly, Spelly Bee, Boxy Letters, Connecty, Strandy, Searchy, Mini Crossy, Midi Crossy, Crossy, Tiley, Sudoky) with 100% offline phone PWA support, 30-day missed-days archive, cross-device profile sync, and 20 themes including OLED Black.</Changes>
   <Config Name="Web UI port" Target="80" Default="8080" Mode="tcp" Description="Port to open Wordly on." Type="Port" Display="always" Required="true" Mask="false">8080</Config>
   <Config Name="Data" Target="/data" Default="/mnt/user/appdata/wordly" Mode="rw" Description="Leaderboard scores are stored here. Keep this mapped so they survive container updates." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/wordly</Config>
   <Config Name="TRUST_PROXY" Target="TRUST_PROXY" Default="" Mode="" Description="Set to 1 if Wordly sits behind a reverse proxy or Cloudflare Tunnel, so rate limits use each player's real IP. Leave empty if players connect directly." Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
