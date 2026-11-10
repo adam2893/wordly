@@ -537,7 +537,8 @@
     const { rows, cols, grid, cellNums } = state.puzzle;
     els.board.style.setProperty("--cw-rows", rows);
     els.board.style.setProperty("--cw-cols", cols);
-    els.board.classList.toggle("cw-large", cols > 7);
+    els.board.classList.toggle("cw-midi", cols > 7 && cols <= 11);
+    els.board.classList.toggle("cw-large", cols > 11);
     els.board.innerHTML = "";
 
     for (let i = 0; i < rows * cols; i++) {
@@ -564,7 +565,7 @@
         li.className = "cw-clue-item";
         li.dataset.dir = w.dir;
         li.dataset.num = String(w.num);
-        li.innerHTML = `<span class="cw-clue-item-num">${w.num}.</span> <span class="cw-clue-item-text">${S.escapeHtml(w.clue)}</span>`;
+        li.innerHTML = `<span class="cw-clue-item-num">${w.num}.</span> <span class="cw-clue-item-text">${S.escapeHtml(w.clue)} <span class="cw-clue-len">(${w.cells.length})</span></span>`;
         li.addEventListener("click", () => {
           state.dir = w.dir;
           const empty = w.cells.find((i) => state.entries[i] === "");
@@ -598,7 +599,7 @@
 
     if (word) {
       els.clueNum.textContent = `${word.num}${word.dir === "across" ? "A" : "D"}`;
-      els.clueText.textContent = word.clue;
+      els.clueText.innerHTML = `${S.escapeHtml(word.clue)} <span class="cw-clue-len">(${word.cells.length})</span>`;
     }
 
     // Update desktop clue lists if present.
@@ -918,7 +919,9 @@
 
   let startMode = "daily";
   try {
-    startMode = localStorage.getItem(KEYS.mode) === "practice" ? "practice" : "daily";
+    const qMode = new URLSearchParams(window.location.search).get("mode");
+    if (qMode === "practice" || qMode === "daily") startMode = qMode;
+    else startMode = localStorage.getItem(KEYS.mode) === "practice" ? "practice" : "daily";
   } catch {
     // ignore
   }

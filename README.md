@@ -7,7 +7,7 @@
 
 **Docker image:** [`ghcr.io/adam2893/wordly:latest`](https://github.com/adam2893/wordly/pkgs/container/wordly) (`docker pull ghcr.io/adam2893/wordly:latest`)
 
-A small, self-hosted collection of daily word and logic games: **Wordly** (guess the 5 or 6 letter word, with optional **Hard Mode\***), **Spelly Bee**, **Boxy Letters**, **Connecty**, **Strandy** (6×8 themed word trails + Spangram), **Mini Crossy**, **Crossy**, **Tiley**, and **Sudoky**. Phone-first and installable as a **PWA** with offline play, accidental-zoom protection, **20 themes** (including **OLED Black**), cross-device profile sync, shared leaderboards for everyone on your server, and a **Daily Archive** (📅) to catch up on any past day you missed. The home page (`/`) is a game menu showing today's progress in each game plus a 1-click **Daily Recap** share button.
+A small, self-hosted collection of 11 daily word and logic games: **Wordly** (guess the 5 or 6 letter word, with optional **Hard Mode\*** and high-contrast recessed eliminated keys), **Spelly Bee**, **Boxy Letters**, **Connecty**, **Strandy** (6×8 themed word trails + Spangram), **Searchy** (Easy 8×8, Medium 10×10 & Hard 12×12 themed word searches), **Mini Crossy** (5×5), **Midi Crossy** (9×9–11×11), **Crossy** (Monday/Tuesday NYT 15×15), **Tiley**, and **Sudoky**. Phone-first and installable as a **PWA** with 100% offline play (pre-caches all 11 games + automatic offline score queue), accidental-zoom protection, **20 themes** (including **OLED Black**), cross-device profile sync, shared leaderboards for everyone on your server, and a **Daily Archive** (📅) to catch up on any past day you missed. The home page (`/`) is a game menu showing today's progress in each game plus a 1-click **Daily Recap** share button.
 
 ## Play against your family and friends
 
@@ -81,9 +81,19 @@ A few of the themes: Forest, Bubblegum 3D, Synthwave and Ocean. Pick yours with 
 - **Daily** + **Practice** modes, **Daily Archive** (📅), active-play timer, and a copyable `🔵`/`🟡`/`💡` emoji result summary.
 - **Leaderboard**: *Today* (hints, time) and *All-time* (solved, flawless ★ solves, average hints, best time, streaks).
 
-### Mini Crossy (`/mini`) & Crossy (`/crossword`)
+### Searchy (`/wordsearch`)
 
-- **Mini Crossy** is a bite-sized 5×5 daily crossword; **Crossy** is a full-sized daily crossword, both sourced from community puzzles on [Crosshare](https://crosshare.org) with constructor credit in the byline.
+- Classic themed **Word Search** generated deterministically on-device (`tools/build_wordsearch.py` -> 141 curated themed word lists in `public/words-wordsearch.js`) — works 100% offline with zero external API calls.
+- Three grid sizes with their own daily puzzles and leaderboard tabs: **Easy** (8×8, 6 words, horizontal/vertical/down-right), **Medium** (10×10, 8 words, 8 directions), and **Hard** (12×12, 10 words, all 8 directions including reverse diagonals).
+- Drag in a straight line (automatically snaps to the nearest of the 8 compass rays) or tap the start letter and tap the end letter. Found words lock in with colorful translucent pill highlights and cross off the word list.
+- **Leaderboard**: separate **Easy**, **Medium**, and **Hard** tabs with *Today* (time, hints) and *All-time* (solved, flawless ★ solves, best time, average time, streaks).
+
+### Mini Crossy (`/mini`), Midi Crossy (`/midi`) & Crossy (`/crossword`)
+
+- Three daily crossword sizes linked by a header switcher (`Mini | Midi | Full`):
+  - **Mini Crossy (`/mini`)**: bite-sized 5×5 daily crossword.
+  - **Midi Crossy (`/midi`)**: mid-sized 9×9–11×11 daily crossword when you want more than a 5×5 without committing to a full 15×15.
+  - **Crossy (`/crossword`)**: full 15×15 daily crossword curated from **Monday & Tuesday New York Times** crosswords (edited by Will Shortz — approachable early-week clues, zero rebus or cryptic gimmicks), with answer letter counts `(N)` shown on every clue.
 - Tap a square to select it, tap again (or tap the clue bar / press `Space`) to switch between **Across** and **Down**, and use `‹` / `›` (or `Tab` / `Enter`) to jump between clues. Desktop viewports also show side-by-side Across and Down clue lists.
 - Optional **Check word**, **Reveal letter**, and **Reveal word** buttons if you get stuck — solving with 0 hints earns a **Flawless ★** badge on the leaderboard.
 - **Daily** + **Practice** modes, **Yesterday's answers**, active-play timer, and a copyable emoji share grid for minis.

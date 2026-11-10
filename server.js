@@ -71,10 +71,12 @@ const beeStore = createStore("bee.json");
 const boxedStore = createStore("boxed.json");
 const connectionsStore = createStore("connections.json");
 const miniStore = createStore("mini.json");
+const midiStore = createStore("midi.json");
 const crosswordStore = createStore("crossword.json");
 const tilesStore = createStore("tiles.json");
 const sudokuStore = createStore("sudoku.json");
 const strandsStore = createStore("strands.json");
+const wordsearchStore = createStore("wordsearch.json");
 const profilesStore = createStore("profiles.json");
 
 // ---------- shared helpers ----------
@@ -584,6 +586,59 @@ function submitSudokuScore(body) {
   return sudokuStore.write(records).then(() => record);
 }
 
+// ---------- Searchy (Word Search) ----------
+
+function computeWordsearchLeaderboard(date, difficulty) {
+  const records = wordsearchStore.read().filter((r) => (r.difficulty || "easy") === difficulty);
+
+  const today = records
+    .filter((r) => r.date === date)
+    .map((r) => ({
+      name: r.name,
+      hints: r.hints || 0,
+      timeMs: r.timeMs,
+    }))
+    .sort((a, b) => a.hints - b.hints || (a.timeMs ?? Infinity) - (b.timeMs ?? Infinity) || a.name.localeCompare(b.name));
+
+  const overall = [];
+  for (const [name, games] of groupByPlayer(records)) {
+    const clean = games.filter((g) => (g.hints || 0) === 0);
+    overall.push({
+      name,
+      solved: games.length,
+      clean: clean.length,
+      avgTimeMs: average(games.filter((g) => Number.isFinite(g.timeMs)).map((g) => g.timeMs)),
+      bestTimeMs:
+        minOrNull(clean.filter((g) => Number.isFinite(g.timeMs)).map((g) => g.timeMs)) ??
+        minOrNull(games.filter((g) => Number.isFinite(g.timeMs)).map((g) => g.timeMs)),
+      ...streaks(games, () => true),
+    });
+  }
+  overall.sort(
+    (a, b) =>
+      b.solved - a.solved ||
+      b.clean - a.clean ||
+      (a.bestTimeMs ?? Infinity) - (b.bestTimeMs ?? Infinity) ||
+      a.name.localeCompare(b.name)
+  );
+  return { today, overall };
+}
+
+function submitWordsearchScore(body) {
+  const name = validName(body.name);
+  const date = validDate(body.date);
+  const difficulty = validSudokuDiff(body.difficulty);
+  const hints = intInRange(body.hints ?? 0, 0, 50, "hints");
+  const timeMs = optionalMs(body.timeMs, "timeMs");
+
+  const records = wordsearchStore.read();
+  const existing = records.find((r) => r.name === name && r.date === date && (r.difficulty || "easy") === difficulty);
+  if (existing) return Promise.resolve(existing);
+  const record = { name, date, difficulty, hints, timeMs, submittedAt: new Date().toISOString() };
+  records.push(record);
+  return wordsearchStore.write(records).then(() => record);
+}
+
 // ---------- rate limiting ----------
 
 // Fixed-window counters per client IP. Writes are the thing worth
@@ -663,7 +718,7 @@ async function readJSONBody(req, maxBytes = 10_000) {
 
 // ---------- Cross-Device Profile Sync ----------
 
-const SYNC_KEY_RE = /^(wordly|bee|boxed|connections|strands|mini|crossword|tiles|sudoku):(daily:|theme|hardMode|length|difficulty)/;
+const SYNC_KEY_RE = /^(wordly|bee|boxed|connections|strands|wordsearch|mini|midi|crossword|tiles|sudoku):(daily:|theme|hardMode|length|difficulty)/;
 
 function mergeSyncValue(oldRaw, newRaw) {
   if (!oldRaw) return newRaw;
@@ -869,6 +924,15 @@ const ROUTES = {
     handler: async (url, req) => submitCrosswordScore(miniStore, await readJSONBody(req)),
   },
 
+  "GET /api/midi/leaderboard": {
+    limit: "read",
+    handler: (url) => computeCrosswordLeaderboard(midiStore, validDate(url.searchParams.get("date"))),
+  },
+  "POST /api/midi/score": {
+    limit: "write",
+    handler: async (url, req) => submitCrosswordScore(midiStore, await readJSONBody(req)),
+  },
+
   "GET /api/crossword/leaderboard": {
     limit: "read",
     handler: (url) => computeCrosswordLeaderboard(crosswordStore, validDate(url.searchParams.get("date"))),
@@ -907,6 +971,19 @@ const ROUTES = {
   "POST /api/strands/score": {
     limit: "write",
     handler: async (url, req) => submitCrosswordScore(strandsStore, await readJSONBody(req)),
+  },
+
+  "GET /api/wordsearch/leaderboard": {
+    limit: "read",
+    handler: (url) =>
+      computeWordsearchLeaderboard(
+        validDate(url.searchParams.get("date")),
+        validSudokuDiff(url.searchParams.get("difficulty") || "easy")
+      ),
+  },
+  "POST /api/wordsearch/score": {
+    limit: "write",
+    handler: async (url, req) => submitWordsearchScore(await readJSONBody(req)),
   },
 
   "GET /api/profile/sync": {

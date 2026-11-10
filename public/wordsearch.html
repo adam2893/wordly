@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#121213">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Searchy — Wordly</title>
+<script>try{var t=localStorage.getItem("wordly:theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="games.css?v=7">
+</head>
+<body class="game-wordsearch">
+<div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+<header class="app-header">
+  <div class="header-row title-row">
+    <div class="header-side">
+      <a href="/" class="icon-btn" aria-label="All games" title="All games">&#8962;</a>
+      <button id="help-btn" class="icon-btn" aria-label="How to play" title="How to play">?</button>
+    </div>
+    <h1 class="app-title">SEARCHY</h1>
+    <div class="header-side header-side-end">
+      <button id="player-btn" class="icon-btn" aria-label="Player profile" title="Player profile">&#128100;</button>
+    </div>
+  </div>
+
+  <div class="header-row controls-row">
+    <div class="length-toggle" role="group" aria-label="Difficulty">
+      <button class="len-btn active" data-diff="easy">Easy</button>
+      <button class="len-btn" data-diff="medium">Med</button>
+      <button class="len-btn" data-diff="hard">Hard</button>
+    </div>
+    <div class="mode-toggle" role="group" aria-label="Game mode">
+      <button class="mode-btn active" data-mode="daily">Daily</button>
+      <button class="mode-btn" data-mode="practice">Practice</button>
+    </div>
+    <button id="theme-btn" class="icon-btn" aria-label="Change theme" title="Change theme">&#9681;</button>
+    <button id="leaderboard-btn" class="icon-btn" aria-label="Leaderboard" title="Leaderboard">&#127942;</button>
+    <button id="new-game-btn" class="icon-btn" aria-label="New puzzle" title="New puzzle">&#8635;</button>
+  </div>
+</header>
+
+<main class="game-main ws-main">
+  <div id="name-gate" class="name-gate hidden">
+    <h2>Who's playing?</h2>
+    <p>Pick a name so today's Searchy result counts on the leaderboard.</p>
+    <input id="gate-name-input" class="text-input" type="text" maxlength="40" placeholder="Your name" autocomplete="off" />
+    <button id="gate-name-btn" class="primary-btn">Start Daily Searchy</button>
+  </div>
+
+  <div id="ws-game" class="ws-game hidden">
+    <div class="ws-top">
+      <div class="ws-theme-box">
+        <span class="ws-theme-label">Theme</span>
+        <span id="ws-theme-title" class="ws-theme-title">—</span>
+      </div>
+      <div class="ws-meta-col">
+        <span id="ws-progress" class="ws-progress">0 / 0 found</span>
+        <span id="ws-timer" class="daily-timer hidden">0:00</span>
+      </div>
+    </div>
+
+    <div id="ws-selection-preview" class="ws-selection-preview" aria-live="polite">Drag or tap start &amp; end letters</div>
+
+    <div id="ws-board-wrap" class="ws-board-wrap">
+      <svg id="ws-svg" class="ws-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <div id="ws-board" class="ws-board" role="grid" aria-label="Word search grid"></div>
+    </div>
+
+    <div id="ws-wordlist" class="ws-wordlist" aria-label="Words to find"></div>
+
+    <div class="bee-controls ws-controls">
+      <button id="ws-hint" class="pill-btn" type="button">Hint &#128161;</button>
+    </div>
+  </div>
+</main>
+
+<!-- How to Play -->
+<div id="help-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <button class="modal-close" data-close="help-modal" aria-label="Close">&times;</button>
+    <h2>How to Play Searchy</h2>
+    <p>Find every hidden theme word in the grid.</p>
+    <ul class="help-list">
+      <li>Words run in straight lines: <strong>horizontally, vertically, or diagonally</strong> (forwards or backwards).</li>
+      <li><strong>Drag</strong> your finger from the first letter to the last letter of a word, or <strong>tap</strong> the first letter and then tap the last letter.</li>
+      <li>Choose <strong>Easy (8&times;8)</strong>, <strong>Medium (10&times;10)</strong>, or <strong>Hard (12&times;12)</strong> in the header — each has its own daily puzzle and leaderboard.</li>
+      <li>Use <strong>Hint &#128161;</strong> to highlight the starting letter of an unfound word. Solving with 0 hints earns a <strong>Flawless &#9733;</strong> badge!</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Leaderboard -->
+<div id="leaderboard-modal" class="modal-overlay hidden">
+  <div class="modal modal-wide">
+    <button class="modal-close" data-close="leaderboard-modal" aria-label="Close">&times;</button>
+    <h2>Searchy Leaderboard</h2>
+    <div class="sudoku-lb-bars">
+      <div class="leaderboard-tabs" role="group" aria-label="Difficulty filter">
+        <button class="lb-tab ws-diff-tab active" data-lb-diff="easy">Easy</button>
+        <button class="lb-tab ws-diff-tab" data-lb-diff="medium">Medium</button>
+        <button class="lb-tab ws-diff-tab" data-lb-diff="hard">Hard</button>
+      </div>
+      <div class="leaderboard-tabs" role="group" aria-label="Leaderboard view">
+        <button class="lb-tab ws-view-tab active" data-lb-view="today">Today</button>
+        <button class="lb-tab ws-view-tab" data-lb-view="all">All-time</button>
+      </div>
+    </div>
+    <div id="leaderboard-content" class="leaderboard-content">
+      <p class="lb-status">Loading…</p>
+    </div>
+  </div>
+</div>
+
+<!-- Result -->
+<div id="result-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <button class="modal-close" data-close="result-modal" aria-label="Close">&times;</button>
+    <h2 id="result-title">Board Cleared!</h2>
+    <p id="result-sub" class="result-text"></p>
+    <div id="result-stats" class="result-stats"></div>
+    <p id="result-countdown" class="result-countdown hidden"></p>
+    <button id="share-btn" class="primary-btn" type="button">Share result</button>
+    <button id="play-again-btn" class="primary-btn hidden" type="button">Play Again</button>
+  </div>
+</div>
+
+<script src="common.js?v=7"></script>
+<script src="words-wordsearch.js?v=7"></script>
+<script src="wordsearch.js?v=7"></script>
+</body>
+</html>

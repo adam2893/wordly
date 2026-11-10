@@ -1793,14 +1793,24 @@ a.icon-btn {
 
 .key.correct { background: var(--color-correct); color: var(--key-text-on-color); }
 .key.present { background: var(--color-present); color: var(--key-text-on-color); }
-.key.absent { background: var(--color-absent); color: var(--color-text); opacity: 0.7; }
-
-/* Absent keys are fully opaque in every theme, so they show the same color
-   as an absent tile instead of letting the background image bleed through
-   (theme blocks above set the colors; this only settles the opacity). */
-html[data-theme] .key.absent,
 .key.absent {
-  opacity: 1 !important;
+  background: var(--color-bg) !important;
+  color: var(--color-text-dim) !important;
+  border: 1px dashed var(--color-border) !important;
+  box-shadow: none !important;
+  opacity: 0.28 !important;
+  filter: saturate(0.2) brightness(0.72);
+  transform: scale(0.95);
+}
+
+html[data-theme="light"] .key.absent,
+html[data-theme="dessert"] .key.absent,
+html[data-theme="bubblegum"] .key.absent {
+  background: var(--color-surface) !important;
+  color: var(--color-text-dim) !important;
+  border: 1px dashed var(--color-border-strong) !important;
+  opacity: 0.34 !important;
+  filter: grayscale(0.8);
 }
 
 /* ---------- Toast ---------- */

@@ -1206,12 +1206,26 @@ kbd {
   background: var(--conn-t0);
 }
 
-/* ---------- Crosswords (Mini Crossy & Crossy) ---------- */
+/* ---------- Crosswords (Mini Crossy, Midi Crossy & Crossy) ---------- */
 .icon-mini svg,
+.icon-midi svg,
 .icon-crossword svg {
   width: 100%;
   height: 100%;
   display: block;
+}
+
+.cw-size-nav a.len-btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cw-clue-len {
+  opacity: 0.72;
+  font-weight: 700;
+  font-size: 0.85em;
 }
 
 .cw-main {
@@ -1287,6 +1301,12 @@ kbd {
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
+}
+
+.cw-board.cw-midi {
+  --cw-size: min(92vw, 355px, calc(100dvh - 395px));
+  gap: 1.5px;
+  padding: 2.5px;
 }
 
 .cw-board.cw-large {
@@ -1372,6 +1392,12 @@ kbd {
   pointer-events: none;
 }
 
+.cw-midi .cw-num {
+  font-size: 0.5rem;
+  top: 1px;
+  left: 1.5px;
+}
+
 .cw-large .cw-num {
   font-size: 0.44rem;
   top: 0.5px;
@@ -1384,6 +1410,11 @@ kbd {
   line-height: 1;
   text-transform: uppercase;
   margin-top: 0.12rem;
+}
+
+.cw-midi .cw-letter {
+  font-size: clamp(0.82rem, 3.2vw, 1.1rem);
+  margin-top: 0.1rem;
 }
 
 .cw-large .cw-letter {
@@ -2458,13 +2489,235 @@ textarea {
   font-size: 0.84rem;
 }
 
-.strands-share-grid {
+  .strands-share-grid {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.3rem;
   font-size: 1.35rem;
   margin: 0.4rem 0 0.75rem;
+}
+
+/* ---------- Searchy (Word Search /wordsearch) ---------- */
+.icon-wordsearch svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.ws-main {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0.35rem 0.75rem calc(0.6rem + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.35rem;
+  overflow-y: auto;
+}
+
+.ws-game {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.38rem;
+}
+
+.ws-top {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.ws-theme-box {
+  flex: 1 1 auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  padding: 0.38rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+.ws-theme-label {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--color-correct);
+  text-transform: uppercase;
+}
+
+.ws-theme-title {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.ws-meta-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 0.15rem;
+  flex-shrink: 0;
+}
+
+.ws-progress {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--color-text-dim);
+  white-space: nowrap;
+}
+
+.ws-progress strong {
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.ws-selection-preview {
+  min-height: 1.45rem;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+}
+
+.ws-board-wrap {
+  --ws-px: min(92vw, 370px, calc(100dvh - 300px));
+  width: var(--ws-px);
+  height: var(--ws-px);
+  position: relative;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border-strong);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  overflow: hidden;
+}
+
+.ws-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ws-pill {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.42;
+}
+
+.ws-pill.active {
+  stroke: var(--color-present);
+  opacity: 0.58;
+}
+
+.ws-board {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(var(--ws-size, 10), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--ws-size, 10), minmax(0, 1fr));
+  place-items: center;
+  touch-action: none;
+}
+
+.ws-cell {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  font-size: clamp(0.78rem, calc(var(--ws-px) / var(--ws-size, 10) * 0.48), 1.18rem);
+  font-weight: 800;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  user-select: none;
+  touch-action: none;
+  border-radius: 6px;
+  transition: transform 0.08s ease;
+}
+
+.ws-cell.active {
+  color: var(--color-text);
+  transform: scale(1.14);
+}
+
+.ws-cell.hint-start {
+  outline: 2.5px dashed var(--color-present);
+  outline-offset: -3px;
+  background: color-mix(in srgb, var(--color-present) 22%, transparent);
+}
+
+.ws-wordlist {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0;
+}
+
+.ws-word-chip {
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-border-strong);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.ws-word-chip.found {
+  background: color-mix(in srgb, var(--ws-chip-color, var(--color-correct)) 24%, var(--color-surface));
+  border-color: var(--ws-chip-color, var(--color-correct));
+  color: var(--color-text-dim);
+  text-decoration: line-through;
+  opacity: 0.72;
+}
+
+.ws-word-chip.hinted {
+  border-color: var(--color-present);
+  box-shadow: 0 0 0 1.5px var(--color-present);
+}
+
+.ws-controls {
+  gap: 0.45rem;
+}
+
+.ws-controls .pill-btn {
+  padding: 0.42rem 0.85rem;
+  min-width: 4.5rem;
+  font-size: 0.82rem;
 }
 
 /* ---------- Mobile Viewport Compact Optimizations ---------- */

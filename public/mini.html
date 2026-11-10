@@ -11,8 +11,8 @@
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.css?v=6">
-<link rel="stylesheet" href="games.css?v=6">
+<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="games.css?v=7">
 </head>
 <body class="game-crossword game-mini">
 <div id="toast-container" class="toast-container" aria-live="polite"></div>
@@ -30,6 +30,11 @@
   </div>
 
   <div class="header-row controls-row">
+    <div class="length-toggle cw-size-nav" role="group" aria-label="Crossword size">
+      <a href="/mini" class="len-btn active">Mini</a>
+      <a href="/midi" class="len-btn">Midi</a>
+      <a href="/crossword" class="len-btn">Full</a>
+    </div>
     <div class="mode-toggle" role="group" aria-label="Game mode">
       <button class="mode-btn active" data-mode="daily">Daily</button>
       <button class="mode-btn" data-mode="practice">Practice</button>
@@ -149,8 +154,8 @@
   </div>
 </div>
 
-<script src="common.js?v=6"></script>
-<script src="words-mini.js?v=6"></script>
+<script src="common.js?v=7"></script>
+<script src="words-mini.js?v=7"></script>
 <script>
 window.CROSSWORD_CONFIG = {
   key: "mini",
@@ -159,6 +164,6 @@ window.CROSSWORD_CONFIG = {
   puzzles: MINI_PUZZLES,
 };
 </script>
-<script src="crossword.js?v=6"></script>
+<script src="crossword.js?v=7"></script>
 </body>
 </html>

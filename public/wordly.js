@@ -840,10 +840,21 @@
   function init() {
     const savedLength = Number(localStorage.getItem(STORAGE_KEYS.length));
     const startLength = savedLength === 6 ? 6 : 5;
+    const params = new URLSearchParams(window.location.search);
+    const qMode = params.get("mode");
     const savedMode = localStorage.getItem(STORAGE_KEYS.mode);
-    const startMode = savedMode === "practice" ? "practice" : "daily";
+    const startMode =
+      qMode === "practice" || qMode === "daily" ? qMode : savedMode === "practice" ? "practice" : "daily";
 
     startGame(startMode, startLength);
+
+    const qGuess = (params.get("guess") || "").toLowerCase();
+    if (startMode === "practice" && qGuess.length === startLength && state.guessSet.has(qGuess)) {
+      state.guesses.push(qGuess);
+      updateKeyStates(qGuess);
+      renderBoard(true);
+      renderKeyboard();
+    }
   }
 
   init();

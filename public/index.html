@@ -11,8 +11,8 @@
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.css?v=6">
-<link rel="stylesheet" href="games.css?v=6">
+<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="games.css?v=7">
 </head>
 <body class="game-menu">
 <div id="toast-container" class="toast-container" aria-live="polite"></div>
@@ -113,6 +113,24 @@
       </span>
     </a>
 
+    <a class="game-card" href="/wordsearch">
+      <span class="game-icon icon-wordsearch" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <line x1="20" y1="22" x2="80" y2="22" stroke="var(--color-correct, #538d4e)" stroke-width="18" stroke-linecap="round" opacity="0.88"></line>
+          <line x1="22" y1="78" x2="78" y2="22" stroke="#3b82f6" stroke-width="18" stroke-linecap="round" opacity="0.82"></line>
+          <circle cx="22" cy="50" r="6.5" fill="var(--color-key-bg, #818384)"></circle>
+          <circle cx="50" cy="78" r="6.5" fill="var(--color-key-bg, #818384)"></circle>
+          <circle cx="78" cy="50" r="6.5" fill="var(--color-key-bg, #818384)"></circle>
+          <circle cx="78" cy="78" r="6.5" fill="var(--bee-center, var(--color-present, #b59f3b))"></circle>
+        </svg>
+      </span>
+      <span class="game-info">
+        <span class="game-name">Searchy</span>
+        <span class="game-desc">Find hidden themed words across Easy, Med &amp; Hard grids.</span>
+        <span id="status-wordsearch" class="game-status"></span>
+      </span>
+    </a>
+
     <a class="game-card" href="/mini">
       <span class="game-icon icon-mini" aria-hidden="true">
         <svg viewBox="0 0 100 100">
@@ -131,6 +149,27 @@
         <span class="game-name">Mini Crossy</span>
         <span class="game-desc">Solve the bite-sized 5&times;5 daily crossword.</span>
         <span id="status-mini" class="game-status"></span>
+      </span>
+    </a>
+
+    <a class="game-card" href="/midi">
+      <span class="game-icon icon-midi" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <rect x="10" y="10" width="24" height="24" rx="4" fill="var(--color-correct, #538d4e)"></rect>
+          <rect x="38" y="10" width="24" height="24" rx="4" fill="var(--color-correct, #538d4e)"></rect>
+          <rect x="66" y="10" width="24" height="24" rx="4" fill="var(--color-absent, #3a3a3c)"></rect>
+          <rect x="10" y="38" width="24" height="24" rx="4" fill="var(--color-key-bg, #818384)"></rect>
+          <rect x="38" y="38" width="24" height="24" rx="4" fill="var(--bee-center, var(--color-present, #b59f3b))"></rect>
+          <rect x="66" y="38" width="24" height="24" rx="4" fill="var(--color-key-bg, #818384)"></rect>
+          <rect x="10" y="66" width="24" height="24" rx="4" fill="var(--color-absent, #3a3a3c)"></rect>
+          <rect x="38" y="66" width="24" height="24" rx="4" fill="var(--bee-center, var(--color-present, #b59f3b))"></rect>
+          <rect x="66" y="66" width="24" height="24" rx="4" fill="var(--bee-center, var(--color-present, #b59f3b))"></rect>
+        </svg>
+      </span>
+      <span class="game-info">
+        <span class="game-name">Midi Crossy</span>
+        <span class="game-desc">Mid-sized 8&times;8 to 11&times;11 daily crossword.</span>
+        <span id="status-midi" class="game-status"></span>
       </span>
     </a>
 
@@ -157,7 +196,7 @@
       </span>
       <span class="game-info">
         <span class="game-name">Crossy</span>
-        <span class="game-desc">Tackle the full-sized daily crossword.</span>
+        <span class="game-desc">Classic Monday/Tuesday 15&times;15 daily crossword.</span>
         <span id="status-crossword" class="game-status"></span>
       </span>
     </a>
@@ -217,7 +256,7 @@
   <p class="menu-foot">New daily puzzles every midnight · play missed days anytime (&#128197;) · leaderboards&nbsp;&#127942;</p>
 </main>
 
-<script src="common.js?v=6"></script>
+<script src="common.js?v=7"></script>
 <script>
 (() => {
   const S = Shared;
@@ -298,6 +337,25 @@
     set("status-strands", "Today's strands are waiting");
   }
 
+  const wsSummary = [
+    ["easy", "Easy"],
+    ["medium", "Med"],
+    ["hard", "Hard"],
+  ]
+    .map(([diff, label]) => {
+      const s = S.load(`wordsearch:daily:${diff}:${today}`);
+      if (!s || (!s.started && !s.over)) return null;
+      if (!s.over) return `${label} in progress`;
+      recapLines.push(`🔍 Searchy (${label}): ${S.formatTimer(s.activeMs || 0)}${!s.hints ? " ★" : ""}`);
+      return `${label} ✓${!s.hints ? " ★" : ""}`;
+    })
+    .filter(Boolean);
+  set(
+    "status-wordsearch",
+    wsSummary.length ? `Today: ${wsSummary.join(" · ")}` : "Today's word search is waiting",
+    wsSummary.length
+  );
+
   const mini = S.load(`mini:daily:${today}`);
   if (mini && mini.over) {
     set(
@@ -310,6 +368,20 @@
     set("status-mini", `Today: in progress · ${mini.filled || 0}/${mini.total || 25}`, true);
   } else {
     set("status-mini", "Today's mini is waiting");
+  }
+
+  const midi = S.load(`midi:daily:${today}`);
+  if (midi && midi.over) {
+    set(
+      "status-midi",
+      `Today: ✓ solved in ${S.formatTimer(midi.activeMs || 0)}${midi.hints ? ` · ${midi.hints} hint${midi.hints === 1 ? "" : "s"}` : " ★"}`,
+      true
+    );
+    recapLines.push(`🧩 Midi Crossy: ${S.formatTimer(midi.activeMs || 0)}${midi.hints ? "" : " ★"}`);
+  } else if (midi && midi.started) {
+    set("status-midi", `Today: in progress · ${midi.filled || 0}/${midi.total || ""}`, true);
+  } else {
+    set("status-midi", "Today's midi is waiting");
   }
 
   const cw = S.load(`crossword:daily:${today}`);

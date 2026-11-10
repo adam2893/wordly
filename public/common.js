@@ -29,7 +29,8 @@ window.Shared = (() => {
   const THEME_KEY = "wordly:theme";
   const PLAYER_KEY = "wordly:playerName";
   const PIN_KEY = "wordly:playerPin";
-  const SYNC_KEY_RE = /^(wordly|bee|boxed|connections|strands|mini|crossword|tiles|sudoku):(daily:|theme|hardMode|length|difficulty)/;
+  const OFFLINE_SCORES_KEY = "wordly:offlineScores";
+  const SYNC_KEY_RE = /^(wordly|bee|boxed|connections|strands|wordsearch|mini|midi|crossword|tiles|sudoku):(daily:|theme|hardMode|length|difficulty)/;
 
   let syncDebounce = null;
   let deferredInstallPrompt = null;
@@ -39,6 +40,11 @@ window.Shared = (() => {
     deferredInstallPrompt = e;
     const btn = document.getElementById("pwa-install-btn");
     if (btn) btn.classList.remove("hidden");
+  });
+
+  window.addEventListener("online", () => {
+    flushOfflineScoreQueue();
+    scheduleCloudSync();
   });
 
   // Prevent accidental double-tap or pinch zoom on phones during fast play.
@@ -624,6 +630,7 @@ window.Shared = (() => {
     // Background sync on page open if player name is already set.
     if (getPlayerName()) {
       setTimeout(() => {
+        flushOfflineScoreQueue();
         syncProfile({ silent: true });
       }, 600);
     }
@@ -664,15 +671,58 @@ window.Shared = (() => {
 
   // ---------- API ----------
 
+  function enqueueOfflineScore(url, body) {
+    try {
+      const queue = load(OFFLINE_SCORES_KEY) || [];
+      const key = `${url}|${body.date || ""}|${body.length || body.difficulty || ""}`;
+      const filtered = queue.filter((item) => item.key !== key).slice(-60);
+      filtered.push({ key, url, body, ts: Date.now() });
+      localStorage.setItem(OFFLINE_SCORES_KEY, JSON.stringify(filtered));
+    } catch {
+      // ignore
+    }
+  }
+
+  async function flushOfflineScoreQueue() {
+    const queue = load(OFFLINE_SCORES_KEY);
+    if (!Array.isArray(queue) || !queue.length) return;
+    const remaining = [];
+    for (const item of queue) {
+      try {
+        const res = await fetch(item.url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(item.body),
+        });
+        if (!res.ok && res.status >= 500) remaining.push(item);
+      } catch {
+        remaining.push(item);
+      }
+    }
+    try {
+      if (remaining.length) localStorage.setItem(OFFLINE_SCORES_KEY, JSON.stringify(remaining));
+      else localStorage.removeItem(OFFLINE_SCORES_KEY);
+    } catch {
+      // ignore
+    }
+  }
+
   async function postJSON(url, body, { keepalive = false } = {}) {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      keepalive,
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        keepalive,
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      if (url.endsWith("/score") && body && typeof body === "object") {
+        enqueueOfflineScore(url, body);
+      }
+      throw err;
+    }
   }
 
   async function getJSON(url) {
